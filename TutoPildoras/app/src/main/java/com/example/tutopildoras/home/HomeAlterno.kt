@@ -56,6 +56,11 @@ fun HomeAlt(modifier: Modifier) {
     var anchoTexto by remember { mutableStateOf(0f) }
     var altoTexto by remember { mutableStateOf(0f) }
 
+//    Para centrar la imagen debemos saber su ancho y alto de forma similar:
+    var anchoImagen by remember { mutableStateOf(0f) }
+    var altoImagen by remember { mutableStateOf(0f) }
+
+
 
 //    Para averiguar el ancho y alto de la pantalla debemos hacerlo en el elemento que lo contiene,
 //    en este caso es el box que contiene a toda la pantalla:
@@ -86,6 +91,20 @@ fun HomeAlt(modifier: Modifier) {
             modifier = Modifier
                 .fillMaxSize()
 //                .align(Alignment.Center)
+                //                Obtenemos el ancho y alto de la imagen:
+                .onGloballyPositioned { coordinates ->
+                    anchoImagen = coordinates.size.width.toFloat()
+                    altoImagen = coordinates.size.height.toFloat()
+
+//                FInalmente centramos la imagen en el centro de la pantalla
+//                tanto en el eje x como en el eje y, asi:
+                    if (positionText == Offset(0f, 0f)) {
+                        positionText = Offset(
+                            (anchoPantalla - anchoImagen) / 2, (altoPantalla - altoImagen) / 2)
+                    }
+                }
+//                FIn centrado de la imagen.
+                //Usamos offset para mover la imagen en la pantalla:
                 .offset { IntOffset(imagen.x.toInt(), imagen.y.toInt()) }
                 .pointerInput(Unit) {
                     detectDragGestures { change, dragAmount ->
@@ -99,8 +118,11 @@ fun HomeAlt(modifier: Modifier) {
 //        Para eso debemos saber el ancho y alto del texto, en el modifier del texto:
         Text(
             text = "Lamborghini Miura",
-//            modifier = Modifier.align(Alignment.Center), //Alineacion en el centro, del texto respecto a la pantalla completa.
-            //Alineacion en la pantalla completa, del texto, respecto a la var positionText:
+//            modifier = Modifier.align(Alignment.Center),
+//          Alineacion en el centro, del texto respecto a la pantalla completa.
+
+            //Alineamos el texto de forma centrada en la pantalla completa,
+            // usando la var positionText:
             modifier = Modifier
 //                Obtenemos el ancho y alto del texto:
                 .onGloballyPositioned { coordinates ->
@@ -114,6 +136,8 @@ fun HomeAlt(modifier: Modifier) {
                             (anchoPantalla - anchoTexto) / 2, (altoPantalla - altoTexto) / 2)
                     }
                 }
+//                FIn centrado del texto.
+
 //                Usamos offset para mover el texto en la pantalla:
                 .offset { IntOffset(positionText.x.toInt(), positionText.y.toInt()) }
 //                Usamos pointerInput para detectar el gesto de arrastre del texto(la presion y movimiento del dedo):
@@ -124,7 +148,7 @@ fun HomeAlt(modifier: Modifier) {
                         positionText += Offset(dragAmount.x, dragAmount.y)
                     }
                 },
-            textAlign = TextAlign.Center, //Alineacion del texto en el espacio disponible del parrafo.
+            textAlign = TextAlign.Center, //Alineacion centrada del texto pero en el parrafo.
             color = Color.Yellow,
             fontSize = 20.sp,
             fontWeight = FontWeight.Bold
