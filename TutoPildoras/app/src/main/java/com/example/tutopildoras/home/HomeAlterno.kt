@@ -75,17 +75,25 @@ fun HomeAlt(modifier: Modifier) {
             }
     ) {
 
-//        La imagen estara fija:
-        /*   Image(
+//        La imagen estara movil con offset y centrada solo usando modifier.align(Alignment.Center):
+           Image(
                painter = painterResource(id = R.drawable.lamborgmiura),
                contentDescription = "Lamborghini Miura",
                modifier = Modifier
                    .fillMaxSize()
                    .align(Alignment.Center)
-           )*/
+                      //Usamos offset para mover la imagen en la pantalla:
+                .offset { IntOffset(imagen.x.toInt(), imagen.y.toInt()) }
+                .pointerInput(Unit) {
+                    detectDragGestures { change, dragAmount ->
+                        change.consume()
+                        imagen += Offset(dragAmount.x, dragAmount.y)
+                    }
+                }
+           )
 
 //        Que la imagen sea movil:
-        Image(
+       /* Image(
             painter = painterResource(id = R.drawable.lamborgmiura),
             contentDescription = "Lamborghini Miura",
             modifier = Modifier
@@ -112,7 +120,7 @@ fun HomeAlt(modifier: Modifier) {
                         imagen += Offset(dragAmount.x, dragAmount.y)
                     }
                 }
-        )
+        )*/
 //        Este el texto se superpone sobre la imagen.
 //        PEro queremos que el texto este centrado al inicio.
 //        Para eso debemos saber el ancho y alto del texto, en el modifier del texto:
