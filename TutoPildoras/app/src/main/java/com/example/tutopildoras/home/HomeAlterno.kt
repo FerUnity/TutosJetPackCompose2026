@@ -4,6 +4,7 @@ package com.example.tutopildoras.home
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
@@ -19,6 +20,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.res.painterResource
@@ -61,7 +63,6 @@ fun HomeAlt(modifier: Modifier) {
     var altoImagen by remember { mutableStateOf(0f) }
 
 
-
 //    Para averiguar el ancho y alto de la pantalla debemos hacerlo en el elemento que lo contiene,
 //    en este caso es el box que contiene a toda la pantalla:
     Box(
@@ -75,52 +76,56 @@ fun HomeAlt(modifier: Modifier) {
             }
     ) {
 
+//        Haremos que sea posible hacer zoom a la imagen usando el gesto de dos dedos.
+        //        Llamamos a la fun composable donde ademas se crea la Imagen:
+        ImagenInteractiva()
+
 //        La imagen estara movil con offset y centrada solo usando modifier.align(Alignment.Center):
-           Image(
-               painter = painterResource(id = R.drawable.lamborgmiura),
-               contentDescription = "Lamborghini Miura",
-               modifier = Modifier
-                   .fillMaxSize()
-                   .align(Alignment.Center)
-                      //Usamos offset para mover la imagen en la pantalla:
-                .offset { IntOffset(imagen.x.toInt(), imagen.y.toInt()) }
-                .pointerInput(Unit) {
-                    detectDragGestures { change, dragAmount ->
-                        change.consume()
-                        imagen += Offset(dragAmount.x, dragAmount.y)
-                    }
-                }
-           )
+        /*     Image(
+                 painter = painterResource(id = R.drawable.lamborgmiura),
+                 contentDescription = "Lamborghini Miura",
+                 modifier = Modifier
+                     .fillMaxSize()
+                     .align(Alignment.Center)
+                        //Usamos offset para mover la imagen en la pantalla:
+                  .offset { IntOffset(imagen.x.toInt(), imagen.y.toInt()) }
+                  .pointerInput(Unit) {
+                      detectDragGestures { change, dragAmount ->
+                          change.consume()
+                          imagen += Offset(dragAmount.x, dragAmount.y)
+                      }
+                  }
+             )*/
 
 //        Que la imagen sea movil:
-       /* Image(
-            painter = painterResource(id = R.drawable.lamborgmiura),
-            contentDescription = "Lamborghini Miura",
-            modifier = Modifier
-                .fillMaxSize()
-//                .align(Alignment.Center)
-                //                Obtenemos el ancho y alto de la imagen:
-                .onGloballyPositioned { coordinates ->
-                    anchoImagen = coordinates.size.width.toFloat()
-                    altoImagen = coordinates.size.height.toFloat()
+        /* Image(
+             painter = painterResource(id = R.drawable.lamborgmiura),
+             contentDescription = "Lamborghini Miura",
+             modifier = Modifier
+                 .fillMaxSize()
+ //                .align(Alignment.Center)
+                 //                Obtenemos el ancho y alto de la imagen:
+                 .onGloballyPositioned { coordinates ->
+                     anchoImagen = coordinates.size.width.toFloat()
+                     altoImagen = coordinates.size.height.toFloat()
 
-//                FInalmente centramos la imagen en el centro de la pantalla
-//                tanto en el eje x como en el eje y, asi:
-                    if (positionText == Offset(0f, 0f)) {
-                        positionText = Offset(
-                            (anchoPantalla - anchoImagen) / 2, (altoPantalla - altoImagen) / 2)
-                    }
-                }
-//                FIn centrado de la imagen.
-                //Usamos offset para mover la imagen en la pantalla:
-                .offset { IntOffset(imagen.x.toInt(), imagen.y.toInt()) }
-                .pointerInput(Unit) {
-                    detectDragGestures { change, dragAmount ->
-                        change.consume()
-                        imagen += Offset(dragAmount.x, dragAmount.y)
-                    }
-                }
-        )*/
+ //                FInalmente centramos la imagen en el centro de la pantalla
+ //                tanto en el eje x como en el eje y, asi:
+                     if (positionText == Offset(0f, 0f)) {
+                         positionText = Offset(
+                             (anchoPantalla - anchoImagen) / 2, (altoPantalla - altoImagen) / 2)
+                     }
+                 }
+ //                FIn centrado de la imagen.
+                 //Usamos offset para mover la imagen en la pantalla:
+                 .offset { IntOffset(imagen.x.toInt(), imagen.y.toInt()) }
+                 .pointerInput(Unit) {
+                     detectDragGestures { change, dragAmount ->
+                         change.consume()
+                         imagen += Offset(dragAmount.x, dragAmount.y)
+                     }
+                 }
+         )*/
 //        Este el texto se superpone sobre la imagen.
 //        PEro queremos que el texto este centrado al inicio.
 //        Para eso debemos saber el ancho y alto del texto, en el modifier del texto:
@@ -141,7 +146,8 @@ fun HomeAlt(modifier: Modifier) {
 //                tanto en el eje x como en el eje y, asi:
                     if (positionText == Offset(0f, 0f)) {
                         positionText = Offset(
-                            (anchoPantalla - anchoTexto) / 2, (altoPantalla - altoTexto) / 2)
+                            (anchoPantalla - anchoTexto) / 2, (altoPantalla - altoTexto) / 2
+                        )
                     }
                 }
 //                FIn centrado del texto.
@@ -177,6 +183,47 @@ fun HomeAlt(modifier: Modifier) {
         ) {
             Text(text = "Fondo")
         }
+    }
+}
+
+//Fun que crea la imagen en un Box y ademas,
+// hace posible hacer zoom a la imagen usando el gesto de dos dedos,
+// usando la fun del modifier: pointerInput()
+// y su fun detectTransformGestures(centro del zoom, desplazamiento, zoom, rotation):
+@Composable
+fun ImagenInteractiva() {
+    //Escala de la imagen:
+    var escala by remember { mutableStateOf(1f) }
+
+    //Posicion de la imagen:
+    var position by remember { mutableStateOf(Offset(0f, 0f)) }
+//    Generamos un Box que contenga a la imagen:
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .pointerInput(Unit) {
+                detectTransformGestures { _, desplazamiento, zoom, _ ->
+                    escala *= zoom //Se usa *= y no += para que el zoom sea mas rapido
+                    position += desplazamiento //Se usa += para que la imagen se mueva con el gesto de dos dedos.
+                }
+            },
+        contentAlignment = Alignment.Center
+    )
+    {
+        Image(
+            painter = painterResource(id = R.drawable.lamborgmiura),
+            contentDescription = "Lamborghini Miura",
+            modifier = Modifier
+//                Para poder usar el zoom de los dedos en la img hacemos:
+                .graphicsLayer(
+//                    Zoom en X e Y:
+                    scaleX = escala.coerceIn(0.5f, 3f),//En X:Minimo zoomeado = 0.5 y maximo limite de zoom = 3
+                    scaleY = escala.coerceIn(0.5f, 3f),// Idem en Y
+//                    Desplazamiento en X e Y:
+                    translationX = position.x,
+                    translationY = position.y
+                )
+        )
     }
 }
 
