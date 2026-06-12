@@ -4,6 +4,7 @@ package com.example.tutopildoras.home
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -186,44 +187,72 @@ fun HomeAlt(modifier: Modifier) {
     }
 }
 
-//Fun que crea la imagen en un Box y ademas,
-// hace posible hacer zoom a la imagen usando el gesto de dos dedos,
-// usando la fun del modifier: pointerInput()
-// y su fun detectTransformGestures(centro del zoom, desplazamiento, zoom, rotation):
+//Fun que crea la imagen en un Box y ademas permiter hacerle zoom,desplazar y rotar.
+// Para eso usamos la fun del modifier: pointerInput()
+// hacemos posible hacer zoom,desplazar y rotar la imagen usando el gesto de dos dedos,
+// con su fun detectTransformGestures(centro del zoom, desplazamiento, zoom, rotation) del pointerInput():
 @Composable
 fun ImagenInteractiva() {
-    //Escala de la imagen:
+    //Escala de la imagen: var que almacena el zoom de la imagen, cuyo valor se va actualizando con el gesto de dos dedos:
+//    Su valor inicial es 1f, que es la escala normal de la imagen.
     var escala by remember { mutableStateOf(1f) }
 
-    //Posicion de la imagen:
+    //Posicion de la imagen: var que almacena la posicion de la imagen, cuyo valor se va actualizando con el gesto de dos dedos:
+//    Su valor inicial es Offset(0f, 0f), que es la posicion normal de la imagen.
     var position by remember { mutableStateOf(Offset(0f, 0f)) }
+
+//    Angulo de rotacion: var que almacena el angulo de rotacion de la imagen, cuyo valor se va actualizando con el gesto de dos dedos:
+//    Su valor inicial es 0f, que es el angulo de rotacion normal de la imagen (Sin rotacion)
+    var rotation by remember { mutableStateOf(0f) }
+
 //    Generamos un Box que contenga a la imagen:
     Box(
         modifier = Modifier
             .fillMaxSize()
             .pointerInput(Unit) {
-                detectTransformGestures { _, desplazamiento, zoom, _ ->
-                    escala *= zoom //Se usa *= y no += para que el zoom sea mas rapido
-                    position += desplazamiento //Se usa += para que la imagen se mueva con el gesto de dos dedos.
+//                Usamos la fun de extension del modifier pointerInput(), detectTransformGestures() para detectar el gesto de dos dedos.
+                // Esto para poder hacer zoom,desplazar y rotar la imagen:
+                detectTransformGestures { _, desplazamiento, zoom, anguloRotacion ->
+                    escala *= zoom //Aplica zoom. Se usa *= y no += para que el zoom sea mas rapido
+                    position += desplazamiento //Aplica desplazamiento. Se usa += para que la imagen se mueva con el gesto de dos dedos.
+                    rotation += anguloRotacion //Aplica rotacion. Se usa += para que la imagen se rote con el gesto de dos dedos.
                 }
+
+            }
+            .pointerInput(Unit) {
+                //De la misma forma con un nueva fun de extension del modifier pointerInput(),
+                // usamos detectTapGestures() para detectar el gesto de tap en la imagen.
+                //Con esto logramos que con un doble toque (onDoubleTap) en la imagen, logremos volver a su posicion original, escala y rotacion inicial:
+                detectTapGestures(onDoubleTap = { _ ->
+                    escala = 1f //Reset de la escala.
+                    position = Offset(0f, 0f) //Reset de la posicion.
+                    rotation = 0f //Reset de la rotacion.
+                })
             },
-        contentAlignment = Alignment.Center
+        contentAlignment = Alignment.Center //Para centrar la imagen en el centro del Box.
     )
     {
         Image(
             painter = painterResource(id = R.drawable.lamborgmiura),
             contentDescription = "Lamborghini Miura",
             modifier = Modifier
-//                Para poder usar el zoom de los dedos en la img hacemos:
+//          Usamos la funcion de extension graphicsLayer(),
+                //   Para poder usar el zoom, desplazamiento y rotacion de la imagen, usando el gesto de dos dedos:
                 .graphicsLayer(
 //                    Zoom en X e Y:
-                    scaleX = escala.coerceIn(0.5f, 3f),//En X:Minimo zoomeado = 0.5 y maximo limite de zoom = 3
+                    scaleX = escala.coerceIn(
+                        0.5f,
+                        3f
+                    ),//En X:Minimo zoomeado = 0.5 y maximo limite de zoom = 3
                     scaleY = escala.coerceIn(0.5f, 3f),// Idem en Y
 //                    Desplazamiento en X e Y:
                     translationX = position.x,
-                    translationY = position.y
+                    translationY = position.y,
+                    rotationZ = rotation //Rotacion en Z con el valor de la var rotation.
                 )
+
         )
+
     }
 }
 
