@@ -1,6 +1,10 @@
 package com.example.tutopildoras.home
 
 
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.animateOffsetAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectDragGestures
@@ -205,6 +209,18 @@ fun ImagenInteractiva() {
 //    Su valor inicial es 0f, que es el angulo de rotacion normal de la imagen (Sin rotacion)
     var rotation by remember { mutableStateOf(0f) }
 
+//    Creamos var de animaciones suaves hacia valores inciales de escala, posicion y rotacion de la imagen, que son los 3 valores de arriba.
+//    Como parametros usamos tween(500, easing = FastOutSlowInEasing) para que la animacion sea mas lenta y suave:
+    val escalaAnimada by animateFloatAsState(targetValue = escala, label = "escala",
+        animationSpec = tween(500, easing = FastOutSlowInEasing))
+    val rotationAnimada by animateFloatAsState(targetValue = rotation, label = "rotation",
+        animationSpec = tween(500, easing = FastOutSlowInEasing))
+//   OJO: En la posicion son 2 valores a resetear por eso se usa animateOffsetAsState() en vez de animateFloatAsState():
+    val positionAnimada by animateOffsetAsState(targetValue = position, label = "position",
+        animationSpec = tween(500, easing = FastOutSlowInEasing))
+
+
+
 //    Generamos un Box que contenga a la imagen:
     Box(
         modifier = Modifier
@@ -237,18 +253,19 @@ fun ImagenInteractiva() {
             contentDescription = "Lamborghini Miura",
             modifier = Modifier
 //          Usamos la funcion de extension graphicsLayer(),
-                //   Para poder usar el zoom, desplazamiento y rotacion de la imagen, usando el gesto de dos dedos:
+                //   Para poder usar el zoom, desplazamiento y rotacion de la imagen, usando el gesto de dos dedos,
+                //   pero lo harenos con las val de animacion en vez de las originales:
                 .graphicsLayer(
 //                    Zoom en X e Y:
-                    scaleX = escala.coerceIn(
+                    scaleX = escalaAnimada.coerceIn(
                         0.5f,
                         3f
                     ),//En X:Minimo zoomeado = 0.5 y maximo limite de zoom = 3
-                    scaleY = escala.coerceIn(0.5f, 3f),// Idem en Y
+                    scaleY = escalaAnimada.coerceIn(0.5f, 3f),// Idem en Y
 //                    Desplazamiento en X e Y:
-                    translationX = position.x,
-                    translationY = position.y,
-                    rotationZ = rotation //Rotacion en Z con el valor de la var rotation.
+                    translationX = positionAnimada.x,
+                    translationY = positionAnimada.y,
+                    rotationZ = rotationAnimada //Rotacion en Z con el valor de la var rotationAnimada.
                 )
 
         )
