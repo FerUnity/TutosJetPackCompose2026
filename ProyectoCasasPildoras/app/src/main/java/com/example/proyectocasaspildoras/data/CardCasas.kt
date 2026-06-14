@@ -30,7 +30,7 @@ fun CardCasas(
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp)
-            .clickable { navController.navigate("casa/${casa.id}") },
+            .clickable { navController.navigate("detalle/${casa.id}") },
         elevation = CardDefaults.cardElevation(
             defaultElevation = 8.dp
         ),

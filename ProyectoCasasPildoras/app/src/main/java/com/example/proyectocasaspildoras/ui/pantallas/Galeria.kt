@@ -1,7 +1,5 @@
-package com.example.proyectocasaspildoras.data
+package com.example.proyectocasaspildoras.ui.pantallas
 
-import android.widget.Button
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -14,6 +12,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.example.proyectocasaspildoras.data.CardCasas
+import com.example.proyectocasaspildoras.data.RepositorioCasa
 
 @Composable
 fun GaleriaCasas(
