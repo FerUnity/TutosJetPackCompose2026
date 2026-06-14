@@ -2,7 +2,7 @@ package com.example.proyectocasaspildoras.data
 
 import com.example.proyectocasaspildoras.R
 
-//data class casa es donde se establecen los datos de las casas.
+//data class casa (clase de datos) que es donde se establecen los datos de las casas.
 data class Casa(
     var id: Int,
     val nombre: String,
@@ -24,7 +24,8 @@ object RepositorioCasa {
         Casa(3, "Casa Moderna", R.drawable.casa3, "Diseño milimalista y elegante")
     )
 
-    //    Aqui creamos una fun para obtener una casa por su id. Por tanto devuelve un elem de clase Casa:
+    //    Aqui creamos una fun para obtener una casa por su id. Por tanto devuelve un elem de clase Casa.
+    //    it es el elemento que se espera encontrar dentro de la lista de casas.:
     fun obtenerCasaPorId(id: Int): Casa? = listaCasas.find { it.id == id }
 // find devuelve el primer elemento que cumpla con la condicion.
 // El "it" es el elemento actual de tipo Casa, que se esta iterando.

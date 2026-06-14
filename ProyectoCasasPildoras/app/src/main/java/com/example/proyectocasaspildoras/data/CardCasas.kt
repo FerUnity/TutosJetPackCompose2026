@@ -1,24 +1,30 @@
 package com.example.proyectocasaspildoras.data
 
+
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 
 @Composable
 fun CardCasas(
     navController: NavController,
-    casa: Casa,
-    repositorioCasa: RepositorioCasa,
+    casa: Casa
 ) {
     Card(
         modifier = Modifier
@@ -37,14 +43,26 @@ fun CardCasas(
     {
         Row(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
+                .padding(8.dp)
         ) {
-            casa.imagenId
+           Image(
+               painter = painterResource(id = casa.imagenId),
+               contentDescription = casa.descripcion,
+               modifier = Modifier.size(80.dp) //tamaño de la imagen en la Card
+           )
+
+            Spacer(modifier = Modifier.width(16.dp))
 
             Column() {
-                casa.nombre
-                casa.descripcion
+                Text(
+                    text = casa.nombre,
+                    style = MaterialTheme.typography.titleMedium
+                )
+                Text(
+                    text = casa.descripcion,
+                    maxLines = 2, //Que ocupe 2 lineas indep del largfo de la descripcion
+                    style = MaterialTheme.typography.bodyMedium
+                )
             }
         }
     }

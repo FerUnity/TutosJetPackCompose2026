@@ -16,7 +16,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 
 @Composable
-fun Bienvenida(navController: NavHostController) {
+fun PantallaInfo(navController: NavHostController) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -24,24 +24,21 @@ fun Bienvenida(navController: NavHostController) {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Text(text = "Bienvenido a la Galeria de Casas",
-            style = MaterialTheme.typography.titleLarge)
-
-        Spacer(modifier = Modifier.height(24.dp))
-
         Button(
-            onClick = { navController.navigate("galeria") }
+            onClick = { /*navController.navigate("bienvenida")*/
+                navController.popBackStack() },
+            modifier = Modifier.align(Alignment.Start) //Para que el boton se alinee arriba a la izquierda de la pantalla
         ) {
-            Text(text = "Ver Galeria")
+            Text(text = "Volver", style = MaterialTheme.typography.titleSmall)
         }
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        Button(
-            onClick = {navController.navigate("info") }
-        ) {
-            Text(text = "Sobre la App")
-        }
-    }
-}
+        Text(text = "Desarrollado por Pildoras informaticas", style = MaterialTheme.typography.titleLarge)
 
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Text(text = "Version 1.0 de ejemplo para enseñanza de la navegacion", style = MaterialTheme.typography.titleMedium)
+    }
+
+}
