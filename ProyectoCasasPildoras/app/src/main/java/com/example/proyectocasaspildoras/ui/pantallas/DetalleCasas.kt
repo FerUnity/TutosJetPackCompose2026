@@ -28,6 +28,8 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import coil.compose.rememberAsyncImagePainter
+import com.example.proyectocasaspildoras.R
 import com.example.proyectocasaspildoras.data.Casa
 import com.example.proyectocasaspildoras.data.RepositorioCasa
 import kotlin.random.Random
@@ -80,16 +82,39 @@ fun DetalleCasas(
                 },
             contentAlignment = Alignment.Center //Para que el Box se alinee al centro de la pantalla.
         ){
-            Image(
-                painter = painterResource(id = casa.imagenId),
-                contentDescription = casa.nombre,
+//            Debemos mostrar la imagen dependiendo si tiene imagenUri tomada desde la galeria
+            // o tiene imagenId que la toma desde la carpeta drawable:
+
+            //Primero si toma la casa desde la galeria o camara, desde el formulario:
+            if (casa.imagenUri != null) {
+                Image(
+//                painter = painterResource(id = casa.imagenId),
+                    painter = rememberAsyncImagePainter(casa.imagenUri),
+                    contentDescription = casa.nombre,
 //                Para mover la imagen con los dedos:
-                modifier = Modifier
-                    .graphicsLayer (
-                        translationX = offset.x,
-                        translationY = offset.y
-                    )
-            )
+                    modifier = Modifier
+                        .graphicsLayer (
+                            translationX = offset.x,
+                            translationY = offset.y
+                        )
+                )
+            }
+            else
+//            Se toma la imagen de la casa desde la carpeta drawable:
+            {
+                Image(
+                    painter = painterResource(id = casa.imagenId ?: R.drawable.casa1),
+     //Se agrega !! porque sabemos que no es null, o bien un operador elvis para que muestre otra imagen por defecto: casa1.
+                    contentDescription = casa.nombre,
+//                    Para mover la imagen con los dedos:
+                    modifier = Modifier
+                        .graphicsLayer (
+                    translationX = offset.x,
+                    translationY = offset.y
+                )
+                )
+            }
+
         }
 
         Spacer(modifier = Modifier.height(16.dp))

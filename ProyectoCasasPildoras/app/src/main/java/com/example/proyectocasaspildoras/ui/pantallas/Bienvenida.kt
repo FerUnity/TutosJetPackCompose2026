@@ -32,7 +32,7 @@ fun Bienvenida(navController: NavHostController) {
         Button(
             onClick = { navController.navigate("galeria") }
         ) {
-            Text(text = "Ver Galeria", style = MaterialTheme.typography.titleSmall)
+            Text(text = "Ver Galeria", style = MaterialTheme.typography.titleMedium)
         }
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -41,6 +41,14 @@ fun Bienvenida(navController: NavHostController) {
             onClick = {navController.navigate("info") }
         ) {
             Text(text = "Sobre la App", style = MaterialTheme.typography.titleSmall)
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Button(
+            onClick = {navController.navigate("registro") }
+        ) {
+            Text(text = "Registrar nueva Casa", style = MaterialTheme.typography.titleMedium)
         }
     }
 }
