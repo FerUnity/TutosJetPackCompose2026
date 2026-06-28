@@ -85,7 +85,8 @@ fun DetalleCasas(
 //            Debemos mostrar la imagen dependiendo si tiene imagenUri tomada desde la galeria
             // o tiene imagenId que la toma desde la carpeta drawable:
 
-            //Primero si toma la casa desde la galeria o camara, desde el formulario:
+            //Primero: si es que la imagenUri no es nula, significa que tomara la imagen de la galeria:
+            // Por ende toma la casa desde la galeria o camara, desde el formulario:
             if (casa.imagenUri != null) {
                 Image(
 //                painter = painterResource(id = casa.imagenId),
@@ -100,11 +101,13 @@ fun DetalleCasas(
                 )
             }
             else
-//            Se toma la imagen de la casa desde la carpeta drawable:
+//  Sino significa que es una de las casas que vienen en la carpeta drawable:
+            //  Por tanto se toma la imagen de la casa desde la carpeta drawable:
             {
                 Image(
                     painter = painterResource(id = casa.imagenId ?: R.drawable.casa1),
-     //Se agrega !! porque sabemos que no es null, o bien un operador elvis para que muestre otra imagen por defecto: casa1.
+     //Se agrega !! porque sabemos que no es null,
+                    // o bien un operador elvis ?: si es que fuera nula la img, para que muestre otra imagen por defecto: casa1.
                     contentDescription = casa.nombre,
 //                    Para mover la imagen con los dedos:
                     modifier = Modifier
