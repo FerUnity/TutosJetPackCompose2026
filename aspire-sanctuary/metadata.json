@@ -1,0 +1,6 @@
+{
+  "name": "Aspire Sanctuary",
+  "description": "Luxury high-end home rental application with curated sanctuaries, local SQLite Room persistence, budgeting, and detailed reservation flows.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
