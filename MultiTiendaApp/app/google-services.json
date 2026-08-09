@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "297097990452",
+    "project_id": "multitiendaapp",
+    "storage_bucket": "multitiendaapp.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:297097990452:android:2b5b2793d990428a649561",
+        "android_client_info": {
+          "package_name": "com.example.multitiendaapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCPoWA2Q3mICstGgrQ-k8Zpc73gdaY-1IY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
