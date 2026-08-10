@@ -33,7 +33,8 @@ fun SelectRoleScreen(
         Card(
             modifier = Modifier
                 .padding(16.dp)
-                .clickable { onGoToRegisterSeller() } //Para llegar a RegisterSellerScreen()
+                .clickable { onGoToRegisterSeller() }
+        //Para llegar a RegisterSellerScreen(). Se define en AppNavHost.kt
         ) {
             Column(
                 modifier = Modifier.padding(16.dp),
@@ -51,13 +52,14 @@ fun SelectRoleScreen(
 
         }
 
-//        Creamos una tarjeta o Card de registro de cliente:
+//        Creamos una tarjeta o Card de registro de cliente o comprador:
 //        //   Que sea clickable para llegar va la pantalla de registro del cliente
 //        //   o RegisterCustomerScreen():
         Card(
             modifier = Modifier
                 .padding(16.dp)
-                .clickable { onGoToRegisterCustomer() } //Para llegar a RegisterCustomerScreen()
+                .clickable { onGoToRegisterCustomer() }
+        //Para llegar a RegisterCustomerScreen(). Se define en AppNavHost.kt
         ) {
             Column(
                 modifier = Modifier.padding(16.dp),
