@@ -71,6 +71,7 @@ dependencies {
 
 //    Ahora hilt:
     implementation(libs.hilt.android)
+    implementation(libs.litert.support.api)
     ksp(libs.hilt.compiler)
     implementation(libs.hilt.navigation.compose)
 

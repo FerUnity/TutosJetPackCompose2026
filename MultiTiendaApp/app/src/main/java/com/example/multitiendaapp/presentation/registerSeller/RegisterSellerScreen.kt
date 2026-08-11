@@ -42,8 +42,11 @@ import com.example.multitiendaapp.R
 //Pantalla de registro de vendedor:
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RegisterSellerScreen(onBack: () -> Unit) {
-    //    Scaffold estrucftura base de pantalla: topbar, bootmbar y actionFloatingButton y conrtenido
+fun RegisterSellerScreen(
+    onBack: () -> Unit,
+    onFinishRegisterSeller: () -> Unit
+) {
+    //    Scaffold es la estructura base de pantalla: topbar, bootmbar y actionFloatingButton y conrtenido
     Scaffold(
         topBar = {
 //            Llamamos a la fun composable TopAppBar() para crear el topbar:
@@ -80,151 +83,152 @@ fun RegisterSellerScreen(onBack: () -> Unit) {
     { //Aca definimos el contenido de la pantalla:
         //El Scaffold nos devuelve aca un paddingValues que es un espacio entre el topbar y el contenido
         // y sirve para evitar que el contenido de la pantalla sea tapado por el Scaffold en este caso por el topbar:
-        paddingValues ->
-       Column(
-           modifier = Modifier
-               .fillMaxSize()
-               .padding(paddingValues) //Para que no se tape el topbar
-               .padding(16.dp) //Padding adicional para el contenido de la pantalla:
-               .verticalScroll(rememberScrollState()), //Para que el contenido de la pantalla sea scrollable
-           horizontalAlignment = Alignment.CenterHorizontally //Para que el contenido de la pantalla sea centrado horizontalmente
-       ) {
-           Image(
-               painterResource(id = R.drawable.ic_seller_register),
-               contentDescription = "Registro de vendedor",
-               modifier = Modifier.size(60.dp)//Para que la imagen sea de 60dp de alto y ancho
-           )
+            paddingValues ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues) //Para que no se tape el topbar
+                .padding(16.dp) //Padding adicional para el contenido de la pantalla:
+                .verticalScroll(rememberScrollState()), //Para que el contenido de la pantalla sea scrollable
+            horizontalAlignment = Alignment.CenterHorizontally //Para que el contenido de la pantalla sea centrado horizontalmente
+        ) {
+            Image(
+                painterResource(id = R.drawable.ic_seller_register),
+                contentDescription = "Registro de vendedor",
+                modifier = Modifier.size(60.dp)//Para que la imagen sea de 60dp de alto y ancho
+            )
 
-           Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(20.dp))
 
 //          Creamos campos de texto con bordes o OutlinedTextField():
 //           Para ingresar el NOMBRE del vendedor en el campo de texto y que quede registrado.
 //           Aca usaremos el ViewModel para guardar el nombre del vendedor:
-           OutlinedTextField(
-               value = "",
-               onValueChange = {},
-               label = { Text(text = "Nombre") },
-               modifier = Modifier.fillMaxWidth(),
-               leadingIcon = {
+            OutlinedTextField(
+                value = "",
+                onValueChange = {},
+                label = { Text(text = "Nombre") },
+                modifier = Modifier.fillMaxWidth(),
+                leadingIcon = {
 //                   Aca va un icono de persona, en la parte izquierda del campo de texto:
-                   Icon(
-                       imageVector = Icons.Default.Person,
-                       contentDescription = "Icono Nombres"
-                   )
+                    Icon(
+                        imageVector = Icons.Default.Person,
+                        contentDescription = "Icono Nombres"
+                    )
 
-               },
-               singleLine = true, //Para que solo se pueda ingresar una linea de texto y no varias en el campo de texto
-           )
+                },
+                singleLine = true, //Para que solo se pueda ingresar una linea de texto y no varias en el campo de texto
+            )
 
-           Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
 //           Campo de texto para los Apellidos del vendedor:
-           OutlinedTextField(
-               value = "",
-               onValueChange = {},
-               label = { Text(text = "Apellidos") },
-               modifier = Modifier.fillMaxWidth(),
-               leadingIcon = {
+            OutlinedTextField(
+                value = "",
+                onValueChange = {},
+                label = { Text(text = "Apellidos") },
+                modifier = Modifier.fillMaxWidth(),
+                leadingIcon = {
 //                   Aca va un icono de persona, en la parte izquierda del campo de texto:
-                   Icon(
-                       imageVector = Icons.Default.Person,
-                       contentDescription = "Icono Apellidos"
-                   )
-               },
-               singleLine = true, //Para que solo se pueda ingresar una linea de texto y no varias en el campo de texto
-           )
+                    Icon(
+                        imageVector = Icons.Default.Person,
+                        contentDescription = "Icono Apellidos"
+                    )
+                },
+                singleLine = true, //Para que solo se pueda ingresar una linea de texto y no varias en el campo de texto
+            )
 
-           Spacer(modifier = Modifier.height(12.dp)) //Espacio entre los campos de texto
+            Spacer(modifier = Modifier.height(12.dp)) //Espacio entre los campos de texto
 
 //           Campo de texto para el correo del vendedor:
-           OutlinedTextField(
-               value = "",
-               onValueChange = {},
-               label = { Text(text = "Correo") },
-               modifier = Modifier.fillMaxWidth(),
-               leadingIcon = {
+            OutlinedTextField(
+                value = "",
+                onValueChange = {},
+                label = { Text(text = "Correo") },
+                modifier = Modifier.fillMaxWidth(),
+                leadingIcon = {
 //                   Aca va un icono de persona, en la parte izquierda del campo de texto
-                   Icon(
-                       imageVector = Icons.Default.Email,
-                       contentDescription = "Icono de Correo"
-                   )
-               },
+                    Icon(
+                        imageVector = Icons.Default.Email,
+                        contentDescription = "Icono de Correo"
+                    )
+                },
 //               Ahora definimos el tipo de teclado que se mostrara en el campo de texto
 //               para optimizarlo para el ingreso de correos electronicos:
-              keyboardOptions = KeyboardOptions(
-                  keyboardType = KeyboardType.Email
-              ),
-               singleLine = true, //Para que solo se pueda ingresar una linea de texto y no varias en el campo de texto
-           )
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Email
+                ),
+                singleLine = true, //Para que solo se pueda ingresar una linea de texto y no varias en el campo de texto
+            )
 
-           Spacer(modifier = Modifier.height(12.dp)) //Espacio entre los campos de texto
+            Spacer(modifier = Modifier.height(12.dp)) //Espacio entre los campos de texto
 
 //           Otro campo de texto para la contraseña del vendedor:
-           OutlinedTextField(
-               value = "",
-               onValueChange = {},
-               modifier = Modifier.fillMaxWidth(),
-               label = { Text(text = "Contraseña") },
-               leadingIcon = {
+            OutlinedTextField(
+                value = "",
+                onValueChange = {},
+                modifier = Modifier.fillMaxWidth(),
+                label = { Text(text = "Contraseña") },
+                leadingIcon = {
 //                   Aca va un icono de persona, en la parte izquierda del campo de texto
-                   Icon(
-                       imageVector = Icons.Default.Lock,
-                       contentDescription = "Icono de Contraseña"
-                   )
-               },
+                    Icon(
+                        imageVector = Icons.Default.Lock,
+                        contentDescription = "Icono de Contraseña"
+                    )
+                },
 //               Optimizamos el texto para contraseña:
-               visualTransformation = PasswordVisualTransformation(),//Para que no se vea la contraseña
-               keyboardOptions = KeyboardOptions(
-                   keyboardType = KeyboardType.Password
-               ),
-               singleLine = true, //Para que solo se pueda ingresar una linea de texto y no varias en el campo de texto
+                visualTransformation = PasswordVisualTransformation(),//Para que no se vea la contraseña
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Password
+                ),
+                singleLine = true, //Para que solo se pueda ingresar una linea de texto y no varias en el campo de texto
 
-           )
+            )
 
-           Spacer(modifier = Modifier.height(12.dp)) //Espacio entre los campos de texto
+            Spacer(modifier = Modifier.height(12.dp)) //Espacio entre los campos de texto
 
 //           Otro campo de texto para ingresar el telefono del vendedor:
-           OutlinedTextField(
-               value = "",
-               onValueChange = {},
-               modifier = Modifier.fillMaxWidth(),
-               label = { Text(text = "Telefono") },
-               leadingIcon = {
+            OutlinedTextField(
+                value = "",
+                onValueChange = {},
+                modifier = Modifier.fillMaxWidth(),
+                label = { Text(text = "Telefono") },
+                leadingIcon = {
 //                   Aca va un icono, en la parte izquierda del campo de texto
-                   Icon(
-                       imageVector = Icons.Default.Phone,
-                       contentDescription = "Icono de Telefono"
-                   )
-               },
+                    Icon(
+                        imageVector = Icons.Default.Phone,
+                        contentDescription = "Icono de Telefono"
+                    )
+                },
 //               Optimizamos el texto para telefonos:
-               keyboardOptions = KeyboardOptions(
-                   keyboardType = KeyboardType.Phone
-               ),
-               singleLine = true, //Para que solo se pueda ingresar una linea de texto
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Phone
+                ),
+                singleLine = true, //Para que solo se pueda ingresar una linea de texto
 
-           )
+            )
 
-           Spacer(modifier = Modifier.height(30.dp)) //Espacio entre los campos de texto
+            Spacer(modifier = Modifier.height(30.dp)) //Espacio entre los campos de texto
 
-//           Creamos un boton para registrar datos del vendedor y para ir a registrar la tienda del vendedor:
-           Button(
-               onClick = { /*TODO*/ },
-               modifier = Modifier.fillMaxWidth()
-           ) {
+//           Creamos un boton para registrar datos del vendedor
+//           y sobretodo para ir a registrar la tienda del vendedor:
+            Button(
+                onClick = { onFinishRegisterSeller() },
+                modifier = Modifier.fillMaxWidth()
+            ) {
 //               En el contenido del boton creamos una fila de elementos: un texto y un icono:
-               Row{
-                   Text(text = "Siguiente")
-                   Spacer(modifier = Modifier.width(8.dp))
-                   Icon(
-                       imageVector = Icons.AutoMirrored.Filled.ArrowForward,
-                       contentDescription = "Ir a siguiente pantalla"
-                   )
+                Row {
+                    Text(text = "Siguiente")
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowForward,
+                        contentDescription = "Ir a siguiente pantalla"
+                    )
 
-               }
-           }
+                }
+            }
 
 
-       } //Cierre de Column()
+        } //Cierre de Column()
 
     }
 

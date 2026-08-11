@@ -7,6 +7,7 @@ import androidx.navigation.compose.composable
 import com.example.multitiendaapp.presentation.login.LoginScreen
 import com.example.multitiendaapp.presentation.registerCustomer.RegisterCustomerScreen
 import com.example.multitiendaapp.presentation.registerSeller.RegisterSellerScreen
+import com.example.multitiendaapp.presentation.registerStore.RegisterStoreScreen
 import com.example.multitiendaapp.presentation.selectRole.SelectRoleScreen
 
 //Este sera el mapa de navegacion de la app.
@@ -23,7 +24,8 @@ fun AppNavHost(navController: NavHostController){
 //            Llamamos a la fun composable que representa esa ruta: LoginScreen()
             LoginScreen(
 //                Aca necesitamos llegar a la pantalla de SelectRole,
-//                para ello pasamos el navController para navegar a la pantalla de SelectRole:
+//                para ello pasamos el navController para navegar a la pantalla de SelectRole.
+//                Para lo cual creamos una fun o callback que se llamara onGoToSelectRole:
                 onGoToSelectRole = { navController.navigate(AppRoute.SelectRole.route) }
             )
         }
@@ -37,8 +39,13 @@ fun AppNavHost(navController: NavHostController){
         }
         composable(AppRoute.RegisterSeller.route){
             RegisterSellerScreen(
-//                Aca necesitamos poder volver a la pantalla anterior:
-                onBack = { navController.popBackStack() }
+//                Aca necesitamos 2 parametros:
+//                Poder volver a la pantalla anterior
+//                y poder ir a la pantalla de reg de tienda:
+                onBack = { navController.popBackStack() },
+                onFinishRegisterSeller = {
+                    navController.navigate(AppRoute.RegisterStore.route)
+                }
             )
         }
 
@@ -47,6 +54,12 @@ fun AppNavHost(navController: NavHostController){
 //                Aca necesitamos poder volver a la pantalla anterior:
                 onBack = { navController.popBackStack() }
             )
+        }
+
+
+        composable(AppRoute.RegisterStore.route){
+            RegisterStoreScreen()
+
         }
 
 
