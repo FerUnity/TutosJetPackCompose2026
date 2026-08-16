@@ -28,7 +28,8 @@ fun CategoryDropdown(
     onCategorySelected: (String) -> Unit //Aca se define una fun que se ejecutara cuando se seleccione una categoria,
 // que se guardo en la var selectedCategory.
 ) {
-    //Primero def si el menu desplegable esta abierto o cerrado en RegisterStoreScreen:
+    //Primero def si el menu desplegable esta abierto o cerrado en RegisterStoreScreen,
+    // usando una var llamada booleana llamada expanded:
     var expanded by remember { mutableStateOf(false) }
     //Se usa el remember para que conserve su estado entre recomposiciones: giro pantallas, etc
 
@@ -49,10 +50,11 @@ fun CategoryDropdown(
         "Salud y bienestar"
     )
 
-//    Ahora creamos un menu desplegable con las categorias recien listadas:
+//    Ahora creamos un menu desplegable con las categorias recien listadas.
+//    Para ello usamos el componente ExposedDropdownMenuBox():
     ExposedDropdownMenuBox(
         expanded = expanded, //Aca se define si el menu desplegable esta abierto o cerrado
-        onExpandedChange = { expanded = it }
+        onExpandedChange = { expanded = !expanded }
         //Aca se define el cambio de estado del menu desplegable al hacer click en el icono de flecha.
     ) {
         //Aca creamos el campo de texto para seleccionar la categoria:
@@ -68,7 +70,7 @@ fun CategoryDropdown(
                 ), //Aca se define que este campo de texto sera el ancla del menu desplegable.
             leadingIcon = {
                 Icon(
-                    imageVector = Icons.Default.Star,
+                    imageVector = Icons.Default.Star, //Una estrella de icono.
                     contentDescription = "Icono de categoria"
 
                 )
@@ -76,16 +78,18 @@ fun CategoryDropdown(
             label = { Text(text = "Categoria de la tienda") },
 
             trailingIcon = { //Aca se define el icono de flecha que se mostrara al final del campo de texto. Al reves del leadingIcon.
-                //Aca se muestra la flecha hacia arriba si el menu desplegable esta abierto y hacia abajo si esta cerrado.
+                //Aca se muestra la flecha hacia arriba si el menu desplegable esta abierto o hacia abajo si esta cerrado.
                 ExposedDropdownMenuDefaults.TrailingIcon(
                     expanded = expanded //Aca se define si el menu desplegable esta abierto o cerrado.
                 )
             }
         )
 
+//        Lo siguiente es para desplegar o no el menu desplegable.
+//        El menu se desplegara segun el estado de la var expanded:
         ExposedDropdownMenu(
-            expanded = expanded,
-            onDismissRequest = { expanded = false }
+            expanded = expanded, //Aca se define si el menu desplegable esta abierto o cerrado.
+            onDismissRequest = { expanded = false } //Para contraer el menu desplegable al hacer click fuera de el.
         ) {
             categories.forEach { category ->
                 DropdownMenuItem(
@@ -93,7 +97,7 @@ fun CategoryDropdown(
                     onClick = {
                         onCategorySelected(category) //Aca enviamos la categoria seleccionada al componenete padre que es RegisterStoreScreen()
                         expanded =
-                            false //Aca hacemos que el menu desplegable se cierre al seleccionar una categoria
+                            false //Aca hacemos que el menu desplegable se cierre luego de seleccionar una categoria
                     }
                 )
             }

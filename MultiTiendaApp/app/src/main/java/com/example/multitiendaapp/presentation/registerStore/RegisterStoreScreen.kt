@@ -36,6 +36,7 @@ import androidx.compose.ui.unit.dp
 import com.example.multitiendaapp.R
 import com.example.multitiendaapp.presentation.component.CategoryDropdown
 
+//Pantalla de registro de la tienda:
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RegisterStoreScreen() {
@@ -61,8 +62,8 @@ fun RegisterStoreScreen() {
     )
     {
         //Aca definimos el contenido de la pantalla:
-        //El Scaffold nos devuelve aca un paddingValues que es un espacio entre el topbar y el contenido,
-        // y sirve para evitar que el contenido de la pantalla sea tapado por el Scaffold en este caso por el topbar:
+        //El Scaffold nos devuelve aca un paddingValues que es un espacio entre el topbar, bootmbar, etc. y el contenido,
+        // y sirve para evitar que el contenido de la pantalla sea tapado por elementos del Scaffold en este caso por el topbar:
             paddingValues ->
         Column(
             modifier = Modifier
@@ -120,8 +121,10 @@ fun RegisterStoreScreen() {
             Spacer(modifier = Modifier.height(12.dp))
 
 
-//            Categorias de la tienda. Llamamos al componente que creamos CategoryDropdown():
-//            Menu desplegable con las categorias de la tienda para seleccionar:
+//            Categorias de la tienda:
+//            Llamamos al componente que creamos CategoryDropdown():
+//            Aca aparece un Menu desplegable con las categorias de la tienda
+//            donde debems seleccionar la categoria de la tienda:
             CategoryDropdown(
                 selectedCategory = selectedCategory,
                 onCategorySelected = { category ->
@@ -132,12 +135,14 @@ fun RegisterStoreScreen() {
 
             Spacer(modifier = Modifier.height(16.dp))
 
-//            Boton para ir a la pantalla siguiente de registro de productos segun la categoria seleccionada:
+//            Boton para ir a la pantalla siguiente de registro de la tienda,
+//           correspondiente a la pantalla de registro de productos segun la categoria seleccionada:
             Button(
                 onClick = { /*TODO*/ },
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Row {
+                    // En el contenido del boton creamos una fila de elementos: un texto y un icono:
                     Text(text = "Siguiente")
                     Spacer(modifier = Modifier.width(8.dp))
                     Icon(
