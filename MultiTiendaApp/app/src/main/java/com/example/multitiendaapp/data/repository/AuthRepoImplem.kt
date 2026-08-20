@@ -11,10 +11,10 @@ import kotlinx.coroutines.tasks.await
 // respecto a la autenticacion del usuario con FireBase y Firestore.
 //Entonces aca se implementan las fun declaradas en la interfaz AuthRepository.kt
 class AuthRepoImplem(
-//    Ahora hacemos la injeccion de dependencias con Firebase y Firestore en el constructor de la clase AuthRepoImplem:
+//    Ahora hacemos la injeccion de dependencias con Firebase y Firestore(de AuthRepositoryModule) en el constructor de la clase AuthRepoImplem:
     private val auth: FirebaseAuth, //Para autenticar, reggistrar y cerrar sesion al usuario con FireBase
     private val firestore: FirebaseFirestore // Para acceder a la base de datos de FireBase
-) : AuthRepository {
+) : AuthRepository { //Aca se implementan las fun declaradas en la interfaz AuthRepository.kt:
     private val collectionUsers: String =
         "users" //Aca definimos la coleccion de usuarios en FireBase
 

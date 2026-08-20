@@ -6,7 +6,6 @@ import com.example.multitiendaapp.core.model.Store
 // pero no los pasos logicos de como se hara.
 // por eso se dice que la interfaz es un contrato que se debe cumplir.
 interface StoreRepository {
-//    Creamos una fun para crear una tienda:
 //    Creamos una fun para crear o registrar una tienda:
     suspend fun createStore(
         store: Store
@@ -17,6 +16,6 @@ interface StoreRepository {
 //    Creamos otra fun para encontrar una tienda especifica segun el id del vendedor, podria ser nulo:
     suspend fun getStoreBySellerId(sellerId: String) : Result<Store?>
 
-//    fun para actualizar datos de una tienda existente. Hay quenponer un parametro de tipo Store:
+//    fun para actualizar datos de una tienda existente. Hay que poner un parametro de tipo Store:
     suspend fun updateStore(store: Store) : Result<Unit> // Solo queremos saber si la actualizacion fue exitosa o no.
 }
