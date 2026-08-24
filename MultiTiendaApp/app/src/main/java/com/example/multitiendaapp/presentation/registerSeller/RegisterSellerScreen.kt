@@ -101,6 +101,7 @@ fun RegisterSellerScreen(
             Spacer(modifier = Modifier.height(20.dp))
 
 //          Creamos campos de texto con bordes o OutlinedTextField():
+
 //           Para ingresar el NOMBRE del vendedor en el campo de texto y que quede registrado.
 //           Aca usaremos el ViewModel para guardar el nombre del vendedor:
             OutlinedTextField(
@@ -176,13 +177,40 @@ fun RegisterSellerScreen(
                     )
                 },
 //               Optimizamos el texto para contraseña:
-                visualTransformation = PasswordVisualTransformation(),//Para que no se vea la contraseña
+                //Para que no se vea la contraseña:
+                visualTransformation = PasswordVisualTransformation(),
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Password
                 ),
                 singleLine = true, //Para que solo se pueda ingresar una linea de texto y no varias en el campo de texto
 
             )
+
+            Spacer(modifier = Modifier.height(12.dp)) //Espacio entre los campos de texto
+
+
+//            Otro campo de terxto para la confirmacion de la contraseña del vendedor:
+            OutlinedTextField(
+                value = "",
+                onValueChange = {},
+                modifier = Modifier.fillMaxWidth(),
+                label = { Text(text = "Confirmar Contraseña") },
+                leadingIcon = {
+//                   Aca va un icono de persona, en la parte izquierda del campo de texto
+                    Icon(
+                        imageVector = Icons.Default.Lock,
+                        contentDescription = "Icono de Confirmar Contraseña"
+                    )
+                },
+//               Optimizamos el texto para contraseña:
+                //Para que no se vea la contraseña:
+                visualTransformation = PasswordVisualTransformation(),
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Password
+                ),
+                singleLine = true, //Para que solo se pueda ingresar una linea de texto y no varias en el campo de texto
+            )
+
 
             Spacer(modifier = Modifier.height(12.dp)) //Espacio entre los campos de texto
 

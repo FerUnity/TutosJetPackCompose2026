@@ -18,7 +18,8 @@ import javax.inject.Inject
 
 //Este viewmodel es para la pantalla de registro de cliente.
 
-//Creamos un data class para reproducir el estado de la pantalla de registro de cliente:
+//Creamos un data class UiState, que es una clase de datos
+// que se usa para representar el estado de la pantalla de registro de cliente e ir actualizandolo:
 data class UiState(
     val firstName: String = "", //repr el nombre que el usuario ingresa en el campo de texto de la pantalla de registro de cliente.
     val lastName: String = "", //repr el apellido que el usuario ingresa en el campo de texto de la pantalla de registro de cliente.
@@ -36,7 +37,7 @@ data class UiState(
 
 sealed interface CustomerEvent {
     data class OnFirstNameChange(val value: String) : CustomerEvent
-//    En la var value guardamos el nuevo valor de nombre que el usuario ingreso en el campo de texto de la pantalla de registro de cliente.
+//    En la var value guardamos el nuevo valor de nombre que el usuario ingreso(evento) en el campo de texto de la pantalla de registro de cliente.
 
     data class OnLastNameChange(val value: String) : CustomerEvent
 //    En la var value guardamos el nuevo valor de apellido que el usuario ingreso en el campo de texto de la pantalla de registro de cliente.
@@ -76,7 +77,7 @@ class RegisterCustomerViewModel @Inject constructor(
 //Inyectamos la dependencia del repositorio de autenticacion, para registro de cliente en la base de datos FireStore.
 ) : ViewModel() // Indicamos que esta clase extiende de ViewModel y que vivira mientras la vista que lo llame este viva.
 {
-//    Crewamos el estado interno y externo de la pantalla de registro de cliente:
+//    Crewamos el estado interno y externo de la pantalla de registro de cliente(UiState()):
 //    //Primero creamos el estado de la pantalla de registro de cliente en su version interna,
     //    que sera mutable pero solo desde el viewmodel.
 //    // Y su estado inicial de cada campo es el del data class UiState(), ver arriba:
@@ -97,8 +98,8 @@ class RegisterCustomerViewModel @Inject constructor(
     // Esta es la version publica, o sea estara expuesta pero solo como lectura para coleccionarlas
 
 
-    //    Esta fun publica la creamos al final y es la puerta de entrada de la vista login (UI) para interactuar con el viewmodel.
-//    O sea se evalua que tipo de evento se recibe y se procesa en la fun.
+    //    Esta fun publica la creamos al final y es la puerta de entrada de la vista RegisterCustomerScreen(UI) para interactuar con el viewmodel.
+//    O sea se evalua que tipo de evento se recibe y se procesa en la fun correspondiente.
 //    o sea si el usuario ingresa un nombre o apellido o correo o contraseña o hace click en el boton de registro,
 //    el evento se procesa en la fun onEvent() y se ejecuta una de las 6 fun correspondientes.
     fun onEvent(event: CustomerEvent) {
@@ -233,7 +234,7 @@ class RegisterCustomerViewModel @Inject constructor(
                 )
             }
 
-            //Llamamos al repositorio de autenticacion Firebase para registrar el cliente,
+            //Llamamos al repositorio de autenticacion Firebase para registrar al cliente,
             // y le pasamos el nombre, apellido, correo y contraseña que ingreso el usuario.
             // Para eso creamos una variable llamada result que almacena el resultado de la consulta a Firebase:
             val result =

@@ -63,6 +63,7 @@ dependencies {
 
 //    La siguiente implementación bom, es para que se descargue toda la versión de Firebase:
     implementation(platform(libs.firebase.bom))
+    implementation(libs.androidx.lifecycle.viewmodel.ktx)
     implementation(libs.androidx.material3)
 
 //    Las siguientes son las implementaciones de Firebase:
