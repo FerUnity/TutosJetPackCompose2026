@@ -174,7 +174,7 @@ class RegisterCustomerViewModel @Inject constructor(
     }
 
 
-    //    Ahora creamos una fun que se encargara de manejar los eventos de la pantalla de registro de cliente,
+    //    Ahora creamos una fun que se encargara de manejar los eventos del boton de registro de cliente,
 //    que contenga el flujo para registrar el cliente.
 //    Es decir que cuando el usuario haga click en el boton de registro, se encargara de llamar a esta fun,
 //    que va a verificar los datos del usuario y si son correctos.
