@@ -14,7 +14,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.rememberNavController
 import com.example.multitiendaapp.navigation.AppNavHost
 import com.example.multitiendaapp.ui.theme.MultiTiendaAppTheme
+import dagger.hilt.android.AndroidEntryPoint
 
+//Esto le dice a hilt que la clase MainActivity pueda inyectar dependencias en sus clases hijos,
+// para que el viewmodel pueda ser inyectado.
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

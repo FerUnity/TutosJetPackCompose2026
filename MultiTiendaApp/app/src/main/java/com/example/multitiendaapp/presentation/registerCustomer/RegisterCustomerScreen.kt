@@ -1,5 +1,6 @@
 package com.example.multitiendaapp.presentation.registerCustomer
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -30,12 +31,16 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.multitiendaapp.R
 
 
@@ -43,8 +48,41 @@ import com.example.multitiendaapp.R
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RegisterCustomerScreen(
-    onBack: () -> Unit
+    viewModel: RegisterCustomerViewModel,
+    onBack: () -> Unit, //fun para volver a la pantalla anterior. se define en AppNavHost.kt
+    onNavigateHome: () -> Unit //fun para navegar a la pantalla de CustomerHomeScreen, luego de registrarse. se define en AppNavHost.kt
 ) {
+//    Ahora observamos el estado de la pantalla de registro del cliente, este estado proviene del viewmodel
+    //    y se llama uiState,
+    //    entonces creamos una variable state que almacena el estado de la pantalla de registro del cliente:
+    val state by viewModel.uiState.collectAsStateWithLifecycle()
+    //Para observar el estado de la pantalla de registro del cliente solo mientras este en la pantalla.
+
+//    Ademas creanos una var context para identificar la aplicacion frente al sistema operativo,
+//    esto para poder usar sus recursos y poder mostrar mensajes al usuario, por ej el Toast:
+//    Para eso usamos LocalContext.current::
+    val context = LocalContext.current
+
+//    Ahora creamos una corrutina especial de JetPack Compose llamada LaunchedEffect(),
+//    que se encargara de mostrar los efectos colaterales de la pantalla de registro del cliente.,
+//    sin bloquear el hilo principal de la aplicacion.
+//    En este caso tenemos 2 efectos disponibles (ver sealed interface CustomerEffect en RegisterCustomerViewModel.kt):
+//    Mostrar un mensaje(ShowMessage) y navegar a otra pantalla(NavigateToHome) :
+    LaunchedEffect(Unit) {
+        viewModel.effect.collect { effect ->
+            when (effect) {
+                is CustomerEffect.ShowMessage -> {
+                    Toast.makeText(context, effect.message, Toast.LENGTH_SHORT).show()
+                }
+
+                is CustomerEffect.NavigateToHome -> {
+                    onNavigateHome()
+                }
+
+            }
+        }
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -91,8 +129,13 @@ fun RegisterCustomerScreen(
 
 //            Campo de texto para nombres del cliente:
             OutlinedTextField(
-                value = "",
-                onValueChange = {},
+                value = state.firstName,
+                onValueChange = {newFirstName ->
+                    viewModel.onEvent(
+                        CustomerEvent.OnFirstNameChange(newFirstName)
+                    )
+
+                },
                 label = { Text(text = "Nombres") },
                 modifier = Modifier.fillMaxWidth(),
                 leadingIcon = {
@@ -108,8 +151,12 @@ fun RegisterCustomerScreen(
 
 //            Campo de texto para apellidos del cliente:
             OutlinedTextField(
-                value = "",
-                onValueChange = {},
+                value = state.lastName,
+                onValueChange = { newLastName ->
+                    viewModel.onEvent(
+                        CustomerEvent.OnLastNameChange(newLastName)
+                    )
+                },
                 label = { Text(text = "Apellidos") },
                 modifier = Modifier.fillMaxWidth(),
                 leadingIcon = {
@@ -125,8 +172,12 @@ fun RegisterCustomerScreen(
 
 //            Campo de texto para el correo del cliente:
             OutlinedTextField(
-                value = "",
-                onValueChange = {},
+                value = state.email,
+                onValueChange = { newEmail ->
+                    viewModel.onEvent(
+                        CustomerEvent.OnEmailChange(newEmail)
+                    )
+                },
                 label = { Text(text = "Correo electronico") },
                 modifier = Modifier.fillMaxWidth(),
                 leadingIcon = {
@@ -147,8 +198,12 @@ fun RegisterCustomerScreen(
 
 //            Campo de texto para la contraseña del cliente:
             OutlinedTextField(
-                value = "",
-                onValueChange = {},
+                value = state.password,
+                onValueChange = { newPassword ->
+                    viewModel.onEvent(
+                        CustomerEvent.OnPasswordChange(newPassword)
+                    )
+                },
                 label = { Text(text = "Contraseña") },
                 modifier = Modifier.fillMaxWidth(),
                 leadingIcon = {
@@ -171,8 +226,12 @@ fun RegisterCustomerScreen(
 
 //            Campo de texto para confirmar la contraseña del cliente:
             OutlinedTextField(
-                value = "",
-                onValueChange = {},
+                value = state.confirmPassword,
+                onValueChange = { newConfirmPassword ->
+                    viewModel.onEvent(
+                        CustomerEvent.OnConfirmPasswordChange(newConfirmPassword)
+                    )
+                },
                 label = { Text(text = "Confirmar contraseña") },
                 modifier = Modifier.fillMaxWidth(),
                 leadingIcon = {
@@ -192,9 +251,35 @@ fun RegisterCustomerScreen(
 
             Spacer(modifier = Modifier.height(30.dp))
 
-//            Finalmente creamos un boton para registrar datos del cliente:
+//           Otro campo de texto para ingresar el telefono del cliente:
+            OutlinedTextField(
+                value = state.phone,
+                onValueChange = { newPhone ->
+                    viewModel.onEvent(
+                        CustomerEvent.OnPhoneChange(newPhone)
+                    )
+                },
+                label = { Text(text = "Telefono") },
+                modifier = Modifier.fillMaxWidth(),
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Default.Person,
+                        contentDescription = "Icono de Telefono"
+                    )
+                },
+//                Aca optimizamos el teclado para el telefono:
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Phone
+                ),
+                singleLine = true //Para que solo se pueda ingresar una linea de texto y no varias en el campo de texto
+            )
+
+            Spacer(modifier = Modifier.height(30.dp))
+
+
+//            Finalmente creamos un boton para registrar datos del cliente nuevo:
             Button(
-                onClick = { /*TODO*/ },
+                onClick = {viewModel.onEvent(CustomerEvent.OnRegisterClick)},
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Row{

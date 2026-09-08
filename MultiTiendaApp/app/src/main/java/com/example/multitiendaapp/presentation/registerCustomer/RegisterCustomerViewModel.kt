@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.multitiendaapp.core.model.UserRole
 import com.example.multitiendaapp.domain.repository.AuthRepository
 import com.example.multitiendaapp.presentation.login.LoginEffect
+import com.example.multitiendaapp.presentation.registerSeller.SellerEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -26,6 +27,7 @@ data class UiState(
     val email: String = "", // repr el correo electronico que el usuario ingresa en el campo de texto de la pantalla de registro de cliente.
     val password: String = "", //repr la contraseña que el usuario ingresa en el campo de texto de la pantalla de registro de cliente.
     val confirmPassword: String = "", //repr la confirmacion de la contraseña que el usuario ingresa en el campo de texto de la pantalla de registro de cliente.
+    val phone: String = "", //repr el telefono que el usuario ingresa en el campo de texto de la pantalla de registro de cliente.
     val isLoading: Boolean = false,
     //para saber si el registro esta cargando o no, para controlar operaciones, ej que los botones esten deshabilitados mientras no se ingrese los datos.
     val errorMessage: String? = null //repr cualquier error que se presente en la pantalla de registro de cliente.
@@ -51,6 +53,8 @@ sealed interface CustomerEvent {
     data class OnConfirmPasswordChange(val value: String) : CustomerEvent
 //    En la var value guardamos el nuevo valor de confirmacion de contraseña que el usuario ingreso en el campo de texto de la pantalla de registro de cliente.
 
+    data class OnPhoneChange(val value: String) : CustomerEvent
+    //    En la var value guardamos el nuevo valor de telefono que el usuario ingreso en el campo de texto de la pantalla de registro de vendedor.
     data object OnRegisterClick : CustomerEvent
 //    Indicamos el evento OnRegisterClick, que repr cuando el usuario hace click en el boton de registro.
 //    Como no hay datos extra como los casos anteiores, no pasamos nada como parametro, solo usamos data object:
@@ -59,7 +63,7 @@ sealed interface CustomerEvent {
 
 //Creamos otra sealed interface para los efectos colaterales de la pantalla de registro de cliente.
 // Los efectos son las acciones que emitimos desde el viewmodel a la vista(UI) y que solo se ejecutan 1 vez,
-// como mostrar mensaje, permisos, nav entre pantallas:
+// En este caso se emitiran mensajes y navegar a otra pantalla:
 
 sealed interface CustomerEffect {
     data class ShowMessage(
@@ -84,7 +88,7 @@ class RegisterCustomerViewModel @Inject constructor(
 
     private val _uiState = MutableStateFlow(UiState())
 
-    //Luego creamos el estado del login en su version externa,
+    //Luego creamos el estado del registro de cliente en su version externa,
     // que estara expuesta a la vista(UI) para reaccionar a sus cambios y mostrarlos en la interfaz de usuario.
     // pero sera de solo lectura:
     val uiState: StateFlow<UiState> = _uiState.asStateFlow()
@@ -109,14 +113,18 @@ class RegisterCustomerViewModel @Inject constructor(
             is CustomerEvent.OnEmailChange -> updateEmail(event.value) //Si hubo ingreso de correo se envia ese evento a la fun updateEmail()
             is CustomerEvent.OnPasswordChange -> updatePassword(event.value) //Si hubo ingreso de contraseña se envia ese evento a la fun updatePassword()
             is CustomerEvent.OnConfirmPasswordChange -> updateConfirmPassword(event.value) //Si hubo ingreso de confirmacion de contraseña se envia ese evento a la fun updateConfirmPassword()
+            is CustomerEvent.OnPhoneChange -> updatePhone(event.value) //Si hubo ingreso de telefono se envia ese evento a la fun updatePhone()
             is CustomerEvent.OnRegisterClick -> registerCustomer() //Si el usuario hace click en el boton de registro se envia ese evento a la fun registerCustomer()
         }
     }
 
 
     //    Ahora creamos las fun para actualizar el estado de la pantalla de registro de cliente.
-//    Esto significa ene ste caso, que se actualiza el estado de los campos de texto del nombre, apellido, correo electronico, contraseña y confirmacion de contraseña.
+//    Esto significa en este caso, que se actualiza el estado de los campos de texto del nombre, apellido, correo electronico, contraseña
+//    y confirmacion de contraseña.
 //    Ademas una fun para manejar el evento de click en el boton de registro que revisa los datos ingresados por el usuario:
+
+//    Creamos una fun que se encargara de actualizar el estado de la pantalla de registro de cliente, para el nombre:
     private fun updateFirstName(value: String) {
         //hacemos una copia del estado actual y actualizamos el valor del campo de texto del nombre con el que ingreso el usuario.
         _uiState.update { current ->
@@ -174,6 +182,19 @@ class RegisterCustomerViewModel @Inject constructor(
     }
 
 
+//    Creamos la fun para actualizar el estado de la pantalla de registro de cliente, para el telefono:
+    private fun updatePhone(value: String) {
+    //hacemos una copia del estado actual y actualizamos el valor del campo de texto del telefono con el que ingreso el usuario.
+    _uiState.update { current ->
+        current.copy(
+            phone = value, //actualizamos el valor del campo de texto del telefono con el que ingreso el usuario.
+            errorMessage = null //borramos el mensaje de error si lo habia
+        )
+    }
+}
+
+
+
     //    Ahora creamos una fun que se encargara de manejar los eventos del boton de registro de cliente,
 //    que contenga el flujo para registrar el cliente.
 //    Es decir que cuando el usuario haga click en el boton de registro, se encargara de llamar a esta fun,
@@ -194,6 +215,8 @@ class RegisterCustomerViewModel @Inject constructor(
             val emailTrimmed = _uiState.value.email.trim()
             val passwordTrimmed = _uiState.value.password.trim()
             val confirmPasswordTrimmed = _uiState.value.confirmPassword.trim()
+            val phoneTrimmed = _uiState.value.phone.trim()
+
 
 //            Ahora verificamos que los campos no esten vacios:
             if (firstNameTrimmed.isEmpty()) {
@@ -224,6 +247,13 @@ class RegisterCustomerViewModel @Inject constructor(
                 return@launch
             }
 
+//            Condicion que el telefono no debe estar vacio:
+            if (phoneTrimmed.isEmpty()) {
+                _effect.emit(CustomerEffect.ShowMessage("El telefono no puede estar vacio"))
+                return@launch
+            }
+
+
             //Ahora actualizamos el estado visual de la pantalla de registro de cliente para que se muestre que esta cargando:
             _uiState.update { current ->
 //            Obtenemos el estadfo actual para hacer una copia
@@ -246,7 +276,7 @@ class RegisterCustomerViewModel @Inject constructor(
                     lastName = lastNameTrimmed,
                     email = emailTrimmed,
                     password = passwordTrimmed,
-                    phone = "",
+                    phone = phoneTrimmed,
                     role = UserRole.CUSTOMER
                 )
 
@@ -261,6 +291,7 @@ class RegisterCustomerViewModel @Inject constructor(
                         email = "",
                         password = "",
                         confirmPassword = "",
+                        phone = "",
                         isLoading = false, // Deja de estar cargando la pantalla de registro de cliente luego de registrarse.
                         errorMessage = null // Borra el mensaje de error si lo habia
                     )

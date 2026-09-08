@@ -1,5 +1,6 @@
 package com.example.multitiendaapp.presentation.registerSeller
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -31,12 +32,16 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.multitiendaapp.R
 
 //Pantalla de registro de vendedor:
@@ -44,8 +49,38 @@ import com.example.multitiendaapp.R
 @Composable
 fun RegisterSellerScreen(
     onBack: () -> Unit,
-    onFinishRegisterSeller: () -> Unit
+    onFinishRegisterSeller: (String) -> Unit,
+    viewModel: RegisterSellerViewModel
 ) {
+//    Ahora observamos el estado de la pantalla de registro del vendedor, este estado proviene del viewmodel
+    //    y se llama uiState,
+    //    entonces creamos una variable state que almacena el estado de la pantalla de registro del vendedor:
+    val state by viewModel.uiState.collectAsStateWithLifecycle()
+    //Para observar el estado de la pantalla de registro del cliente solo mientras este en la pantalla.
+
+//    Ademas creanos una var context para identificar la aplicacion frente al sistema operativo,
+//    esto para poder usar sus recursos y poder mostrar mensajes al usuario, por ej el Toast:
+//    Para eso usamos LocalContext.current::
+    val context = LocalContext.current
+
+    //    Ahora creamos una corrutina especial de JetPack Compose llamada LaunchedEffect(),
+//    que se encargara de mostrar los efectos colaterales de la pantalla de registro del cliente.,
+//    sin bloquear el hilo principal de la aplicacion.
+//    En este caso tenemos 2 efectos disponibles (ver sealed interface CustomerEffect en RegisterCustomerViewModel.kt):
+//    Mostrar un mensaje(ShowMessage) y navegar a otra pantalla(NavigateToHome) :
+    LaunchedEffect(Unit) {
+        viewModel.effect.collect { effect ->
+            when (effect) {
+                is SellerEffect.ShowMessage -> {
+                    Toast.makeText(context, effect.message, Toast.LENGTH_SHORT).show()
+                } //Esto es para mostrar un mensaje como toast en la pantalla de registro del vendedoren pantalla que provienen del viewmodel
+                is SellerEffect.NavigateToRegisterScreen -> {
+                   onFinishRegisterSeller(effect.sellerUid)
+                }
+            }
+        }
+    }
+
     //    Scaffold es la estructura base de pantalla: topbar, bootmbar y actionFloatingButton y conrtenido
     Scaffold(
         topBar = {
@@ -105,8 +140,12 @@ fun RegisterSellerScreen(
 //           Para ingresar el NOMBRE del vendedor en el campo de texto y que quede registrado.
 //           Aca usaremos el ViewModel para guardar el nombre del vendedor:
             OutlinedTextField(
-                value = "",
-                onValueChange = {},
+                value = state.firstName,
+                onValueChange = { newFirstName ->
+                    viewModel.onEvent(SellerEvent.OnFirstNameChange(newFirstName))
+                    //Esto es para que cuando el usuario ingrese un nombre en el campo de texto,
+              // el viewmodel lo guarde en el estado de la pantalla de registro de vendedor y lo muestre en la pantalla.
+                },
                 label = { Text(text = "Nombre") },
                 modifier = Modifier.fillMaxWidth(),
                 leadingIcon = {
@@ -124,8 +163,12 @@ fun RegisterSellerScreen(
 
 //           Campo de texto para los Apellidos del vendedor:
             OutlinedTextField(
-                value = "",
-                onValueChange = {},
+                value = state.lastName,
+                onValueChange = { newLastName ->
+                    viewModel.onEvent(SellerEvent.OnLastNameChange(newLastName))
+                    //Esto es para que cuando el usuario ingrese un apellido en el campo de texto,
+                    // el viewmodel lo guarde en el estado de la pantalla de registro de vendedor y lo muestre en la pantalla.
+                },
                 label = { Text(text = "Apellidos") },
                 modifier = Modifier.fillMaxWidth(),
                 leadingIcon = {
@@ -142,8 +185,12 @@ fun RegisterSellerScreen(
 
 //           Campo de texto para el correo del vendedor:
             OutlinedTextField(
-                value = "",
-                onValueChange = {},
+                value = state.email,
+                onValueChange = { newEmail ->
+                    viewModel.onEvent(SellerEvent.OnEmailChange(newEmail))
+                    //Esto es para que cuando el usuario ingrese un correo en el campo de texto,
+                    // el viewmodel lo guarde en el estado de la pantalla de registro de vendedor y lo muestre en la pantalla.
+                },
                 label = { Text(text = "Correo") },
                 modifier = Modifier.fillMaxWidth(),
                 leadingIcon = {
@@ -165,8 +212,12 @@ fun RegisterSellerScreen(
 
 //           Otro campo de texto para la contraseña del vendedor:
             OutlinedTextField(
-                value = "",
-                onValueChange = {},
+                value = state.password,
+                onValueChange = { newPassword ->
+                    viewModel.onEvent(SellerEvent.OnPasswordChange(newPassword))
+                    //Esto es para que cuando el usuario ingrese una contraseña en el campo de texto,
+                    // el viewmodel lo guarde en el estado de la pantalla de registro de vendedor y lo muestre en la pantalla.
+                },
                 modifier = Modifier.fillMaxWidth(),
                 label = { Text(text = "Contraseña") },
                 leadingIcon = {
@@ -191,8 +242,12 @@ fun RegisterSellerScreen(
 
 //            Otro campo de terxto para la confirmacion de la contraseña del vendedor:
             OutlinedTextField(
-                value = "",
-                onValueChange = {},
+                value = state.confirmPassword,
+                onValueChange = { newConfirmPassword ->
+                    viewModel.onEvent(SellerEvent.OnConfirmPasswordChange(newConfirmPassword))
+                    //Esto es para que cuando el usuario ingrese una confirmacion de contraseña en el campo de texto,
+                    // el viewmodel lo guarde en el estado de la pantalla de registro de vendedor y lo muestre en la pantalla.
+                },
                 modifier = Modifier.fillMaxWidth(),
                 label = { Text(text = "Confirmar Contraseña") },
                 leadingIcon = {
@@ -216,8 +271,12 @@ fun RegisterSellerScreen(
 
 //           Otro campo de texto para ingresar el telefono del vendedor:
             OutlinedTextField(
-                value = "",
-                onValueChange = {},
+                value = state.phone,
+                onValueChange = { newPhone ->
+                    viewModel.onEvent(SellerEvent.OnPhoneChange(newPhone))
+                    //Esto es para que cuando el usuario ingrese un telefono en el campo de texto,
+                    // el viewmodel lo guarde en el estado de la pantalla de registro de vendedor y lo muestre en la pantalla.
+                },
                 modifier = Modifier.fillMaxWidth(),
                 label = { Text(text = "Telefono") },
                 leadingIcon = {
@@ -240,7 +299,9 @@ fun RegisterSellerScreen(
 //           Creamos un boton para registrar datos del vendedor
 //           y sobretodo para ir a registrar la tienda del vendedor:
             Button(
-                onClick = { onFinishRegisterSeller() },
+                onClick = {
+                    viewModel.onEvent(SellerEvent.OnNextClick)
+                },
                 modifier = Modifier.fillMaxWidth()
             ) {
 //               En el contenido del boton creamos una fila de elementos: un texto y un icono:
