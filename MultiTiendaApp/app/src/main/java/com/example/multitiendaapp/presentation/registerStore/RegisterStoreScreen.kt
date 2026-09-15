@@ -1,5 +1,6 @@
 package com.example.multitiendaapp.presentation.registerStore
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -26,20 +27,56 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.multitiendaapp.R
 import com.example.multitiendaapp.presentation.component.CategoryDropdown
 
 //Pantalla de registro de la tienda:
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RegisterStoreScreen() {
+fun RegisterStoreScreen(
+    viewModel: RegisterStoreViewModel,
+    onNavigateHome: () -> Unit
+) {
+//    Ahora observamos el estado de la pantalla de registro de la tienda, este estado proviene del viewmodel
+    // y se llama uiState,
+    // entonces creamos una variable state que almacena el estado de la pantalla de registro de la tienda:
+    val state by viewModel.uiState.collectAsStateWithLifecycle()
+    //Para observar el estado de la pantalla de registro de la tienda solo mientras este en la pantalla.
+
+    //    Ademas creanos una var context para identificar la aplicacion frente al sistema operativo,
+//    esto para poder usar sus recursos y poder mostrar mensajes al usuario, por ej el Toast:
+//    Para eso usamos LocalContext.current::
+    val context = LocalContext.current
+
+    //    Ahora creamos una corrutina especial de JetPack Compose llamada LaunchedEffect(),
+//    que se encargara de mostrar los efectos colaterales de la pantalla de registro del cliente.,
+//    sin bloquear el hilo principal de la aplicacion.
+//    En este caso tenemos 2 efectos disponibles desde el viewmodel (ver sealed interface CustomerEffect en RegisterCustomerViewModel.kt):
+//    Mostrar un mensaje(ShowMessage) y navegar a otra pantalla(NavigateToSellerHome) :
+    LaunchedEffect(Unit) {
+        viewModel.effect.collect { effect ->
+//            Aca evaluamos que efecto llego desde el viewmodel:(son 2 efectos disponibles)
+            when (effect) {
+                is StoreEffect.ShowMessage -> {
+                    Toast.makeText(context, effect.message, Toast.LENGTH_SHORT).show()
+                } //Esto es para mostrar un mensaje como toast en la pantalla de registro de la tienda pantalla que provienen del viewmodel
+                is StoreEffect.NavigateToSellerHome -> {
+                    onNavigateHome()
+                }
+            }
+        }
+    }
+
 //    Creamos una var que almacena la categoria de tienda seleccionada por el vendedor.
     //    Esa seleccion va a ser recordada entre recomposiciones gracias a remember:
     var selectedCategory by remember { mutableStateOf("") }
@@ -84,8 +121,12 @@ fun RegisterStoreScreen() {
 //          Campos de texto:
 //          Nombre de la tienda:
             OutlinedTextField(
-                value = "",
-                onValueChange = {},
+                value = state.storeName, //Aca guardamos el valor del campo de texto por defecto, del nombre de la tienda
+                onValueChange = { newStoreName ->
+                    viewModel.onEvent(StoreEvent.OnStoreNameChange(newStoreName))
+                    //Esto es para que cuando el usuario ingrese un nombre en el campo de texto,
+                    // el viewmodel lo guarde en el estado de la pantalla de registro de la tienda y lo muestre en la pantalla.
+                },
                 modifier = Modifier.fillMaxWidth(),
                 label = { Text(text = "Nombre de la tienda") },
                 leadingIcon = {
@@ -103,8 +144,12 @@ fun RegisterStoreScreen() {
 
 //          Descripcion de la tienda:
             OutlinedTextField(
-                value = "",
-                onValueChange = {},
+                value = state.storeDescription, //Aca guardamos el valor del campo de texto por defecto, de la descripcion de la tienda
+                onValueChange = { newStoreDescription ->
+                    viewModel.onEvent(StoreEvent.OnStoreDescriptionChange(newStoreDescription))
+                    //Esto es para que cuando el usuario ingrese una descripcion en el campo de texto,
+                    // el viewmodel lo guarde en el estado de la pantalla de registro de la tienda y lo muestre en la pantalla.
+                },
                 modifier = Modifier.fillMaxWidth(),
                 label = { Text(text = "Descripcion de la tienda") },
                 leadingIcon = {
@@ -130,6 +175,10 @@ fun RegisterStoreScreen() {
                 onCategorySelected = { category ->
                     selectedCategory =
                         category //Aca guardamos la categoria seleccionada en la var selectedCategory
+
+                    //Aca llamamos al evento OnCategoryChange() del viewmodel para que guarde la categoria seleccionada
+                    // que quedo almacenada en la var selectedCategory:
+                    viewModel.onEvent(StoreEvent.OnCategoryChange(category))
                 }
             )
 
@@ -138,7 +187,9 @@ fun RegisterStoreScreen() {
 //            Boton para ir a la pantalla siguiente de registro de la tienda,
 //           correspondiente a la pantalla de registro de productos segun la categoria seleccionada:
             Button(
-                onClick = { /*TODO*/ },
+                onClick = {
+                    viewModel.onEvent(StoreEvent.OnNextClick)
+                },
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Row {

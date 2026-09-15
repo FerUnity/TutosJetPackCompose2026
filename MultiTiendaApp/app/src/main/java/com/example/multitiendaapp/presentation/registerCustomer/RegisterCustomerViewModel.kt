@@ -22,15 +22,16 @@ import javax.inject.Inject
 //Creamos un data class UiState, que es una clase de datos
 // que se usa para representar el estado de la pantalla de registro de cliente e ir actualizandolo:
 data class UiState(
-    val firstName: String = "", //repr el nombre que el usuario ingresa en el campo de texto de la pantalla de registro de cliente.
-    val lastName: String = "", //repr el apellido que el usuario ingresa en el campo de texto de la pantalla de registro de cliente.
-    val email: String = "", // repr el correo electronico que el usuario ingresa en el campo de texto de la pantalla de registro de cliente.
-    val password: String = "", //repr la contraseña que el usuario ingresa en el campo de texto de la pantalla de registro de cliente.
-    val confirmPassword: String = "", //repr la confirmacion de la contraseña que el usuario ingresa en el campo de texto de la pantalla de registro de cliente.
-    val phone: String = "", //repr el telefono que el usuario ingresa en el campo de texto de la pantalla de registro de cliente.
+    val firstName: String = "", //repr el nombre que el usuario ingresa en el campo de texto de la pantalla de registro de cliente, por defecto esta vacio.
+    val lastName: String = "", //repr el apellido que el usuario ingresa en el campo de texto de la pantalla de registro de cliente, por defecto esta vacio.
+    val email: String = "", // repr el correo electronico que el usuario ingresa en el campo de texto de la pantalla de registro de cliente, por defecto esta vacio.
+    val password: String = "", //repr la contraseña que el usuario ingresa en el campo de texto de la pantalla de registro de cliente, por defecto esta vacio.
+    val confirmPassword: String = "", //repr la confirmacion de la contraseña que el usuario ingresa en el campo de texto de la pantalla de registro de cliente, por defecto esta vacio.
+    val phone: String = "", //repr el telefono que el usuario ingresa en el campo de texto de la pantalla de registro de cliente, por defecto esta vacio.
     val isLoading: Boolean = false,
-    //para saber si el registro esta cargando o no, para controlar operaciones, ej que los botones esten deshabilitados mientras no se ingrese los datos.
-    val errorMessage: String? = null //repr cualquier error que se presente en la pantalla de registro de cliente.
+    //para saber si el registro esta cargando o no, para controlar operaciones, ej que los botones esten deshabilitados mientras no se ingrese los datos,
+    // por defecto esta en false.
+    val errorMessage: String? = null //repr cualquier error que se presente en la pantalla de registro de cliente, por defecto esta en null.
 )
 
 //Creamos un sealed interface para los eventos de la pantalla de registro de cliente.
@@ -266,7 +267,8 @@ class RegisterCustomerViewModel @Inject constructor(
 
             //Llamamos al repositorio de autenticacion Firebase para registrar al cliente,
             // y le pasamos el nombre, apellido, correo y contraseña que ingreso el usuario.
-            // Para eso creamos una variable llamada result que almacena el resultado de la consulta a Firebase:
+            // Para eso creamos una variable llamada result que almacena la respueta
+            // a la solicitud de registro del cliente en el repositorio de autenticacion Firebase.
             val result =
 //     Si el registro fue exitoso, el repositorio de autenticacion Firebase en este caso, nos devuelve un usuario autenticado.
             // que tendra como datos el nombre, apellido, correo y contraseña que ingreso el usuario, osea

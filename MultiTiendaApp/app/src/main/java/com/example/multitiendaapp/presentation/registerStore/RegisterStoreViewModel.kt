@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.multitiendaapp.core.model.Store
 import com.example.multitiendaapp.domain.repository.StoreRepository
+import com.example.multitiendaapp.navigation.AppRoute
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -43,7 +44,7 @@ sealed interface StoreEvent {
     //    En la var value guardamos el nuevo valor de la descripcion que el usuario ingreso en el campo de texto de la pantalla de registro de la tienda.
     data class OnCategoryChange(val categoryId: String) : StoreEvent
 
-    //    En la var value guardamos el nuevo valor de la categoria que el usuario selecciono en el menu desplegable de la pantalla de registro de la tienda.
+    //En la var value guardamos el nuevo valor de la categoria que el usuario selecciono en el menu desplegable de la pantalla de registro de la tienda.
     data object OnNextClick : StoreEvent
     //Indicamos el evento OnNextClick, que repr cuando el usuario hace click en el boton de registro en la base de datos FireStore.
 }
@@ -52,13 +53,13 @@ sealed interface StoreEvent {
 //Los efectos tambien son eventos o acciones que emitimos desde el viewmodel a la vista(UI) y que solo se ejecutan 1 vez,
 // como mostrar mensaje, permisos, nav entre pantallas:
 
-sealed interface SellerEffect {
+sealed interface StoreEffect {
     data class ShowMessage(
         val message: String
-    ) : SellerEffect //repr un mensaje que se muestra en la pantalla de registro de la tienda
+    ) : StoreEffect //repr un mensaje que se muestra en la pantalla de registro de la tienda
     // y que se emite una sola vez, desde el viewmodel a la vista(UI).
 
-    data object NavigateToSellerHome : SellerEffect
+    data object NavigateToSellerHome : StoreEffect
     //repr el efecto que nos permitira navegar a la pantalla de registro de productos segun la categoria seleccionada,
 // en que enviaremos el id del vendedor para registrarlo como dueño de la tienda.
 }
@@ -66,11 +67,21 @@ sealed interface SellerEffect {
 @HiltViewModel //Indicamos que este viewmodel debe ser creado y gestionado por inyeccion de dependencias de Hilt.
 class RegisterStoreViewModel @Inject constructor(
     private val storeRepository: StoreRepository, //Este es el repositorio de autenticacion que se inyecta en el viewmodel
-    savedStateHandle: SavedStateHandle //Para capturar el id del vendedor que registro la tienda.
+    savedStateHandle: SavedStateHandle //Para recibir argumentos cuando se navega entre pantallas,
+// en este caso el Uid del vendedor que registro la tienda.
 //Inyectamos la dependencia del repositorio de autenticacion, para registro de tienda en la base de datos FireStore.
 ) : ViewModel() // Indicamos que esta clase extiende de ViewModel y que vivira mientras la vista que lo llame este viva
 // y que sobreviva a cambios de comfig como rotacion de pantalla.
 {
+    private val sellerUid: String = //Aca guardamos el id del vendedor esencial para registrar la tienda.
+        requireNotNull(
+            savedStateHandle[AppRoute.RegisterStore.ARG_SELLER_UID]
+            //value almacena el id del vendedor que registro la tienda.
+        ){
+            //Aca va un mensaje de error si el id del vendedor no es valido o no se puede obtener:
+            "sellerUid es requerido, no puede ser nulo"
+
+        }
     //    Creamos el estado interno y externo de la pantalla de registro de la tienda(UiState()):
 //    Primero creamos el estado de la pantalla de registro de la tienda en su version interna,
 //        //    que sera mutable pero solo desde el viewmodel.
@@ -85,10 +96,10 @@ class RegisterStoreViewModel @Inject constructor(
 //    Ahora creamos el flujo de efectos colaterales de la pantalla de registro de la tienda, que sera mutable pero solo desde el viewmodel,
 //    para emitir efectos colaterales a la vista(UI) como mostrar mensajes, navegar entre pantallas y que solo se emitiran 1 vez:
 
-    private val _effect = MutableSharedFlow<SellerEffect>()
+    private val _effect = MutableSharedFlow<StoreEffect>()
     //flujo interno para emitir efx de una vez, como son mostrar mensajes y navegar
 
-    val effect: SharedFlow<SellerEffect> = _effect.asSharedFlow()
+    val effect: SharedFlow<StoreEffect> = _effect.asSharedFlow()
 //    Esta es la version publica, o sea estara expuesta pero solo como lectura para coleccionarlas
 
     //Esta fun publica la creamos al final y es la puerta de entrada de la vista RegisterStoreScreen(UI) para interactuar con el viewmodel.
@@ -167,19 +178,19 @@ class RegisterStoreViewModel @Inject constructor(
 
             //            Ahora verificamos que los campos no esten vacios:
             if (storeNameTrimmed.isEmpty()) {
-                _effect.emit(SellerEffect.ShowMessage("El nombre no puede estar vacio"))
+                _effect.emit(StoreEffect.ShowMessage("El nombre no puede estar vacio"))
                 return@launch
                 // Si el nombre esta vacio se envia el mensaje y se sale de la fun registerStore() lo que hace que no se haga el registro.
             }
 
             if (storeDescriptionTrimmed.isEmpty()) {
-                _effect.emit(SellerEffect.ShowMessage("La descripcion no puede estar vacia"))
+                _effect.emit(StoreEffect.ShowMessage("La descripcion no puede estar vacia"))
                 return@launch
 
             }
 
             if (categoryIdTrimmed.isEmpty()) {
-                _effect.emit(SellerEffect.ShowMessage("La categoria no puede estar vacia"))
+                _effect.emit(StoreEffect.ShowMessage("La categoria no puede estar vacia"))
                 return@launch
 
             }
@@ -197,7 +208,7 @@ class RegisterStoreViewModel @Inject constructor(
             //Vamos a crear el objeto store(data class Store()) para enviarlo a la base de datos Firestore,
             // Para eso creamos una variable llamada store que almacena el resultado de la consulta a Firebase:
             val store = Store(
-                sellerId = "",//aca va el id del vendedor que registro la tienda
+                sellerId = sellerUid,//aca va el id del vendedor que registro la tienda
                 name = storeNameTrimmed,
                 description = storeDescriptionTrimmed,
                 category = categoryIdTrimmed
@@ -220,10 +231,10 @@ class RegisterStoreViewModel @Inject constructor(
                 }
 
 //                efecto para mostrar un mensaje de registro exitoso:
-                _effect.emit(SellerEffect.ShowMessage("La tienda fue creada exitosamente"))
+                _effect.emit(StoreEffect.ShowMessage("La tienda fue creada exitosamente"))
 
 //                Otro efecto para navegar a la pantalla de registro de productos segun la categoria seleccionada:
-                _effect.emit(SellerEffect.NavigateToSellerHome)
+                _effect.emit(StoreEffect.NavigateToSellerHome)
             }
 //            Si el proceso de registro no fue exitoso, el repositorio de autenticacion Firebase en este caso, nos devuelve un error:
                 .onFailure { error ->
@@ -234,7 +245,7 @@ class RegisterStoreViewModel @Inject constructor(
                         )
                     }
 //                    Finalmente llamamos a un efecto con un texto que muestre mensaje de arriba o bien un mensaje de error por defecto:
-                    _effect.emit(SellerEffect.ShowMessage(error.message ?: "Registro fallido"))
+                    _effect.emit(StoreEffect.ShowMessage(error.message ?: "Registro fallido"))
                 }
 
 

@@ -20,18 +20,19 @@ import javax.inject.Inject
 //Creamos un data class UiState, que es una clase de datos
 // que se usa para representar el estado de la pantalla de registro de vendedor e ir actualizandolo:
 data class UiState(
-    val firstName: String = "", //repr el nombre que el usuario ingresa en el campo de texto de la pantalla de registro de vendedor.
-    val lastName: String = "", //repr el apellido que el usuario ingresa en el campo de texto de la pantalla de registro de vendedor.
-    val email: String = "", // repr el correo electronico que el usuario ingresa en el campo de texto de la pantalla de registro de vendedor.
-    val password: String = "", //repr la contraseña que el usuario ingresa en el campo de texto de la pantalla de registro de vendedor.
-    val confirmPassword: String = "", //repr la confirmacion de la contraseña que el usuario ingresa en el campo de texto de la pantalla de registro de vendedor.
-    val phone: String = "", //repr el telefono que el usuario ingresa en el campo de texto de la pantalla de registro de vendedor.
+    val firstName: String = "", //repr el nombre que el usuario ingresa en el campo de texto de la pantalla de registro de vendedor, por defecto esta vacio.
+    val lastName: String = "", //repr el apellido que el usuario ingresa en el campo de texto de la pantalla de registro de vendedor, por defecto esta vacio.
+    val email: String = "", // repr el correo electronico que el usuario ingresa en el campo de texto de la pantalla de registro de vendedor, por defecto esta vacio.
+    val password: String = "", //repr la contraseña que el usuario ingresa en el campo de texto de la pantalla de registro de vendedor, por defecto esta vacio.
+    val confirmPassword: String = "", //repr la confirmacion de la contraseña que el usuario ingresa en el campo de texto de la pantalla de registro de vendedor, por defecto esta vacio.
+    val phone: String = "", //repr el telefono que el usuario ingresa en el campo de texto de la pantalla de registro de vendedor, por defecto esta vacio.
     val isLoading: Boolean = false,
-    //para saber si el registro esta cargando o no, para controlar operaciones, ej que los botones esten deshabilitados mientras no se ingrese los datos
-    val errorMessage: String? = null //repr cualquier error que se presente en la pantalla de registro de vendedor.
+    //para saber si el registro esta cargando o no, para controlar operaciones, ej que los botones esten deshabilitados mientras no se ingrese los datos,
+    // por defecto esta en false.
+    val errorMessage: String? = null //repr cualquier error que se presente en la pantalla de registro de vendedor, por defecto esta en null.
 )
 
-//Creamos un sealed interface para los eventos de la pantalla de registro de vendedor.
+//Creamos un sealed interface para los eventos de la pantalla de registro de vendedor o RegisterSellerScreen().
 //Los eventos son las acciones que el usuario realiza en la pantalla de registro de vendedor y que llegan a este viewmodel.
 // Luego estos eventos se procesan mas abajo en la fun onEvent() del viewmodel.
 
@@ -96,20 +97,20 @@ class RegisterSellerViewModel @Inject constructor(
 //    pero sera de solo lectura:
     val uiState: StateFlow<UiState> = _uiState.asStateFlow()
 
-//    Ahora creamos el flujo de efectos colaterales de la pantalla de registro de vendedor, que sera mutable pero solo desde el viewmodel,
+    //    Ahora creamos el flujo de efectos colaterales de la pantalla de registro de vendedor, que sera mutable pero solo desde el viewmodel,
 //    para emitir efectos colaterales a la vista(UI) como mostrar mensajes, navegar entre pantallas y que solo se emitiran 1 vez:
-
     private val _effect = MutableSharedFlow<SellerEffect>()
     //flujo interno para emitir efx de una vez, como son mostrar mensajes y navegar
 
     val effect: SharedFlow<SellerEffect> = _effect.asSharedFlow()
-//    Esta es la version publica, o sea estara expuesta pero solo como lectura para coleccionarlas
+//    Esta es la version publica, o sea estara expuesta en la vista(UI) para reaccionar a sus cambios,
+//    pero solo como lectura para colectarlas
 
 
 //Esta fun publica la creamos al final y es la puerta de entrada de la vista RegisterSellerScreen(UI) para interactuar con el viewmodel.
 //    O sea se evalua que tipo de evento se recibe y se procesa en la fun correspondiente.
 //    o sea si el usuario ingresa un nombre o apellido o correo o contraseña o hace click en el boton de registro,
-//    el evento se procesa en la fun onEvent() y se ejecuta una de las 6 fun correspondientes.
+//    el evento se procesa en la fun onEvent() y se ejecuta una de las 7 fun correspondientes.
 
     fun onEvent(event: SellerEvent) {
         when (event) {
@@ -195,11 +196,12 @@ class RegisterSellerViewModel @Inject constructor(
         }
     }
 
-//    Ahora creamos una fun que se encargara de manejar los eventos de la pantalla de registro de vendedor,
+//    Ahora creamos una fun cuando se presione el BOTON de registro del vendedor,
+//    que se encargara de manejar los eventos de la pantalla de registro de vendedor,
 //    que contenga el flujo para registrar el vendedor.
 //    Es decir que cuando el usuario haga click en el boton de registro, se encargara de llamar a esta fun,
 //    que va a verificar los datos del usuario y si son correctos.
-    //    Ademas esta fun realiza una proteccion si se prersionea el boton de registro varias veces:
+    //    Ademas esta fun realiza una proteccion si se prersiona el boton de registro varias veces:
 
     private fun registerSeller() {
         if (_uiState.value.isLoading) return
@@ -227,27 +229,33 @@ class RegisterSellerViewModel @Inject constructor(
             if (lastNameTrimmed.isEmpty()) {
                 _effect.emit(SellerEffect.ShowMessage("El apellido no puede estar vacio"))
                 return@launch
+                // Si el apellido esta vacio se envia el mensaje y se sale de la fun registerSeller() lo que hace que no se haga el registro.
 
             }
 
             if (emailTrimmed.isEmpty()) {
                 _effect.emit(SellerEffect.ShowMessage("El correo electronico no puede estar vacio"))
                 return@launch
+                // Si el correo esta vacio se envia el mensaje y se sale de la fun registerSeller() lo que hace que no se haga el registro.
             }
 
             if (passwordTrimmed.isEmpty()) {
                 _effect.emit(SellerEffect.ShowMessage("La contraseña no puede estar vacia"))
                 return@launch
+                // Si la contraseña esta vacia se envia el mensaje y se sale de la fun registerSeller() lo que hace que no se haga el registro.
             }
 
             if (confirmPasswordTrimmed.isEmpty()) {
                 _effect.emit(SellerEffect.ShowMessage("La confirmacion de contraseña no puede estar vacia"))
                 return@launch
+                // Si la confirmacion de contraseña esta vacia se envia el mensaje y se sale de la fun registerSeller(),
+                // lo que hace que no se haga el registro.
             }
 
             if (phoneTrimmed.isEmpty()) {
                 _effect.emit(SellerEffect.ShowMessage("El telefono no puede estar vacio"))
                 return@launch
+                // Si el telefono esta vacio se envia el mensaje y se sale de la fun registerSeller() lo que hace que no se haga el registro.
             }
             //            Condicion que la contraseña y su confirmacion debe ser iiguales:
             if (passwordTrimmed != confirmPasswordTrimmed) {
@@ -259,7 +267,7 @@ class RegisterSellerViewModel @Inject constructor(
 
             //Ahora actualizamos el estado visual de la pantalla de registro de vendedor para que se muestre que esta cargando:
             _uiState.update { current ->
-                //Actualizamos el estado de la pantalla de registro de vendedor, resetado a su estado inicial:
+                //Actualizamos el estado de la pantalla de registro de vendedor, reseteando a su estado inicial:
                 current.copy(
                     isLoading = true, // Indica que esta cargando la pantalla de registro de vendedor.
                     errorMessage = null // Borra el mensaje de error si lo habia
@@ -270,12 +278,10 @@ class RegisterSellerViewModel @Inject constructor(
             // en una var llamada result
             // Llamamos al repositorio de autenticacion Firebase para registrar al vendedor,
 //            y le pasamos el nombre, apellido, correo y contraseña que ingreso el usuario.
-            // Para eso creamos una variable llamada result que almacena el resultado de la consulta a Firebase:
+            // Para eso creamos una variable llamada result que almacena la respuesta
+            // a la solicitud de registro del vendedor en el repositorio de autenticacion Firebase:
 
             val result =
-            //     Si el registro fue exitoso, el repositorio de autenticacion Firebase en este caso, nos devuelve un usuario autenticado.
-            // que tendra como datos el nombre, apellido, correo y contraseña que ingreso el usuario, osea
-                // firstNameTrimmed, lastNameTrimmed, emailTrimmed y passwordTrimmed.
                 authRepository.registerUser(
                     firstName = firstNameTrimmed,
                     lastName = lastNameTrimmed,
@@ -284,12 +290,14 @@ class RegisterSellerViewModel @Inject constructor(
                     phone = phoneTrimmed,
                     role = UserRole.SELLER
                 )
-//            Si el registro fue exitoso, el repositorio de autenticacion Firebase en este caso, nos devuelve un usuario autenticado.
-            // y actulaizamos el estado de la pantalla de registro de vendedor:
+//           Si el registro fue exitoso, el repositorio de autenticacion Firebase en este caso, nos devuelve un usuario autenticado.
+//            // que tendra como datos el nombre, apellido, correo y contraseña que ingreso el usuario, osea
+//                // firstNameTrimmed, lastNameTrimmed, emailTrimmed y passwordTrimmed.
+
+            // y actulaizamos el estado de la pantalla de registro de vendedor,
+            // reseteando a su estado inicial::
             result.onSuccess { sellerUser ->
                 _uiState.update { current ->
-                    //Actualizamos el estado de la pantalla de registro de vendedor,
-                    // reseteando a su estado inicial:
                     current.copy(
                         firstName = "",
                         lastName = "",
@@ -317,8 +325,9 @@ class RegisterSellerViewModel @Inject constructor(
                     _uiState.update { current ->
                         current.copy( // Actualizamos el estado de la pantalla de registro de vendedor,
                             isLoading = false, // Deja de estar cargando la pantalla de registro de vendedor
-                            errorMessage = error.message ?: "No se pudo registrar al vendedor"
-                            // Y se muestra un mensaje de error que nos devuelve el repositorio de autenticacion Firebase y si no viene ponemos uno por defecto.
+                            errorMessage = error.message ?: "No se pudo registrar al vendedor"// Y se muestra un mensaje de error,
+                        // que nos devuelve el repositorio de autenticacion Firebase,
+                            //pero si ese mensaje es nulo, le ponemos un mensaje por defecto, usando el operador Elvis.
                         )
 
                     }

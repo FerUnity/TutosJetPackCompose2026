@@ -79,18 +79,15 @@ fun AppNavHost(navController: NavHostController) {
 //                Aca pasamos como argumento una fun onNavigateHome, que nos permite navegar a la pantalla de SellerHomeScreen,
 //                luego de registrarse:
                 onNavigateHome = {
-//                    Para ir a la pantalla de SellerHomeScreen, luego de registrarse,
                     navController.navigate(AppRoute.SellerHome.route) {
-                        //Luego para que no se pueda volver a la pantalla de RegisterSeller, luego de registrarse,
-                        //hacemos asi:
-                        popUpTo(AppRoute.RegisterSeller.route) {
+                        popUpTo(AppRoute.RegisterStore.route) {
                             inclusive = true
                         }
                     }
-
                 }
             )
         }
+
 
 
 //        Pantalla de SellerHomeScreen, luego de Registrarse o Iniciar sesion:
