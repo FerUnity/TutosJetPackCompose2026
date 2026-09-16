@@ -24,9 +24,13 @@ import com.example.multitiendaapp.presentation.sellerHome.SellerHomeScreen
 //Definimos la fun composable de navegacion de la app que se llamara AppNavHost.
 //Esta fun se llama desde la clase MainActivity.kt
 @Composable
-fun AppNavHost(navController: NavHostController) {
+fun AppNavHost(navController: NavHostController, startDestination: String) {
 //    Definimos la pantalla inicial con su ruta, la cual sera Login:
-    NavHost(navController = navController, startDestination = AppRoute.Login.route) {
+    NavHost(
+        navController = navController,
+        startDestination = startDestination //Aca pasamos la ruta de la pantalla inicial
+    // que proviene de AppRoute.kt el cual la define segun el rol del usuario, o bien sera Login.
+    ) {
 //        Aca definimos las vistas y los param para navegar a ellas:
         composable(AppRoute.Login.route) {
 //            Llamamos a la fun composable que representa esa ruta: LoginScreen()

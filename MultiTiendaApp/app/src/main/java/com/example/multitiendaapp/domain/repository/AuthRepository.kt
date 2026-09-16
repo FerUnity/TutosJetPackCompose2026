@@ -10,6 +10,7 @@ import com.example.multitiendaapp.core.model.UserRole
 //La logica real y concreta se encuentra en la clase AuthRepoImplem.kt.
 
 // Esta una interfaz para definir las operaciones (suspend fun) que realizaremos con la autenticacion del usuario:
+// Por ejemplo saber si el usuario esta logueado o no, registrar un usuario, iniciar sesion, cerrar sesion, etc.:
 interface AuthRepository {
 //  Creamos una fun para regisrtrar un usuario: suspend significa que esta funcion puede ser pausada y reanudada
     //    sin bloquear el hilo principal de la aplicacion.,

@@ -158,7 +158,7 @@ class AuthRepoImplem(
 
     override suspend fun getCurrentUser(): AppUser? = runCatching {
         val currentUser = auth.currentUser ?: return null
-//        llemos el doc del usuario actual desde Firestore, con su uid:
+//        leemos el doc del usuario actual desde Firestore, con su uid:
         val snapshot = usersRef().document(currentUser.uid).get().await()
 //        Si el documento fue encontrado, lo convertimos en un objeto AppUser y lo retornamos:
         snapshot.toObject(AppUser::class.java)
