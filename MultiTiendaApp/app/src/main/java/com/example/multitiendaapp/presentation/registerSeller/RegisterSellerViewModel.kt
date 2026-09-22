@@ -126,9 +126,10 @@ class RegisterSellerViewModel @Inject constructor(
 
 
     //    Ahora creamos las fun para actualizar el estado de la pantalla de registro de vendedor,
-//    Esto significa, , que se actualiza el estado de los campos de texto del nombre, apellidos, correo, contraseña, confirmacion de contraseña y telefono.
-//    Ademas una fun para manejar el evento de click en el boton de registro que revisa los datos ingresados por el usuario:
-//Primero el Nombre
+//Esto significa, , que se actualiza el estado de los campos de texto del nombre, apellidos, correo, contraseña, confirmacion de contraseña
+// y telefono.
+//Ademas otra fun para manejar el evento del click del boton de registro, que revisa los datos ingresados por el usuario:
+//Primero cuando se ingresa el Nombre
     private fun updateFirstName(value: String) {
         //hacemos una copia del estado actual y actualizamos el valor del campo de texto del nombre con el que ingreso el usuario.
         _uiState.update { current ->
@@ -200,12 +201,13 @@ class RegisterSellerViewModel @Inject constructor(
 //    que se encargara de manejar los eventos de la pantalla de registro de vendedor,
 //    que contenga el flujo para registrar el vendedor.
 //    Es decir que cuando el usuario haga click en el boton de registro, se encargara de llamar a esta fun,
-//    que va a verificar los datos del usuario y si son correctos.
+//    que va a verificar los datos del usuario y ver si son correctos.
     //    Ademas esta fun realiza una proteccion si se prersiona el boton de registro varias veces:
 
     private fun registerSeller() {
         if (_uiState.value.isLoading) return
-        //Este if lo que es hace es verificar si el estado de la pantalla de registro de vendedor es cargando, si esta cargando, esta fun no hara nada.
+        //Este if lo que es hace es verificar si el estado de la pantalla de registro de vendedor es cargando,
+        // si esta cargando, esta fun no hara nada.
         // o sea si el ususario presiona el boton de registro varias veces, no hace nada porque ya esta cargando.
 
         //    HArenos una corrutina sobre el ciclo de vida del viewmodel. Si el viewmodel muere, la corrutina tambien lo hara.
@@ -290,11 +292,12 @@ class RegisterSellerViewModel @Inject constructor(
                     phone = phoneTrimmed,
                     role = UserRole.SELLER
                 )
-//           Si el registro fue exitoso, el repositorio de autenticacion Firebase en este caso, nos devuelve un usuario autenticado.
+//           Si el registro fue exitoso, el repositorio de autenticacion Firebase en este caso,
+//           al ser consultado desde cualquier parte de la app, nos devuelve un usuario autenticado.
 //            // que tendra como datos el nombre, apellido, correo y contraseña que ingreso el usuario, osea
 //                // firstNameTrimmed, lastNameTrimmed, emailTrimmed y passwordTrimmed.
 
-            // y actulaizamos el estado de la pantalla de registro de vendedor,
+            // Luego actulaizamos el estado de la pantalla de registro de vendedor,
             // reseteando a su estado inicial::
             result.onSuccess { sellerUser ->
                 _uiState.update { current ->

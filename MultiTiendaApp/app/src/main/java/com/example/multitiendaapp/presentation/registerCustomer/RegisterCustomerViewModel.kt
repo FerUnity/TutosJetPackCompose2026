@@ -271,7 +271,7 @@ class RegisterCustomerViewModel @Inject constructor(
             // a la solicitud de registro del cliente en el repositorio de autenticacion Firebase.
             val result =
 //     Si el registro fue exitoso, el repositorio de autenticacion Firebase en este caso, nos devuelve un usuario autenticado.
-            // que tendra como datos el nombre, apellido, correo y contraseña que ingreso el usuario, osea
+            // que tendra como datos el nombre, apellido, correo y contraseña que ingreso el usuario, o sea
                 // firstNameTrimmed, lastNameTrimmed, emailTrimmed y passwordTrimmed.
                 authRepository.registerUser(
                     firstName = firstNameTrimmed,
@@ -282,8 +282,13 @@ class RegisterCustomerViewModel @Inject constructor(
                     role = UserRole.CUSTOMER
                 )
 
-//            Si el registro fue exitoso, el repositorio de autenticacion Firebase en este caso, nos devuelve un usuario autenticado.
-//            // y actulaizamos el estado de la pantalla de registro de cliente:
+//            Si el registro fue exitoso, el repositorio de autenticacion Firebase en este caso,
+//            nos devuelve un usuario autenticado desde cualquier parte de la app,
+//            que tendra como datos el nombre, apellido, correo y contraseña que ingreso el usuario,
+            // o sea firstNameTrimmed, lastNameTrimmed, emailTrimmed y passwordTrimmed.
+
+//            // Luego actulaizamos el estado de la pantalla de registro de cliente a su estado inicial,
+//            ademas se muestra que no esta cargando la pantalla de registro de cliente:
             result.onSuccess { user ->
                 _uiState.update { current ->
                     //Actualizamos el estado de la pantalla de registro de cliente, resetado a su estado inicial:
@@ -302,9 +307,11 @@ class RegisterCustomerViewModel @Inject constructor(
 //                Agregamos un efecto para mostrar un mensaje de registro exitoso:
                 _effect.emit(CustomerEffect.ShowMessage("Registro exitoso"))
 
+//                OJO: PARA IR A LA PANTALLA DE INICIO DE CLIENTE LUEGO QUE EL USUARIO YA ESTA REGISTRADO EXITOSAMENTE:
 //                Agregamos un efecto para navegar a la pantalla inicial de la aplicacion, pero como cliente:
                 _effect.emit(CustomerEffect.NavigateToHome)
             }
+
 //            Si el, proceso de registro no fue exitoso, el repositorio de autenticacion Firebase en este caso, nos devuelve un error:
                 .onFailure { error ->
                     _uiState.update { current ->

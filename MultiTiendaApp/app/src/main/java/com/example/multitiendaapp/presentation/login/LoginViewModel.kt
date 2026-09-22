@@ -120,6 +120,7 @@ class LoginViewModel @Inject constructor(
 
     //    Ahora creamos una fun que se encargara de manejar los eventos de la pantalla de login,
 //    que contenga el flujo para iniciar sesion.
+
 //    Es decir que cuando el usuario haga click en el boton de login,
 //    se encargara de llamar a esta fun que va a verificar los datos del usuario y si son correctos.
 //    Esta fun realiza una proteccion si se prersionea el boton de login varias veces:
@@ -176,7 +177,8 @@ class LoginViewModel @Inject constructor(
 //                Y llamamso a un efecto con un texto qe diga inicio de sesion exitoso:
                 _effect.emit(LoginEffect.ShowMessage("Inicio de sesion exitoso"))
 
-//                Y con otro efecto para entrar a la pantalla correspondiente al rol elegido por el usuario:
+//                Y con otro efecto para entrar a la pantalla HOME correspondiente al rol elegido por el usuario,
+//                este efcto lo invocamos en la fun onEvent() del viewmodel LoginViewModel():
                 _effect.emit(LoginEffect.NavigateByRole(user.role))
 
     //Si el login no fue exitoso, el repositorio de autenticacion Firebase en este caso, nos devuelve un error.
