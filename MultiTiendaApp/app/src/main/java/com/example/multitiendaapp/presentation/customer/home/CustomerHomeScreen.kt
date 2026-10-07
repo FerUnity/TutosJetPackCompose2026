@@ -1,4 +1,4 @@
-package com.example.multitiendaapp.presentation.sellerHome
+package com.example.multitiendaapp.presentation.customer.home
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -8,9 +8,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 
-// Vista de la pantalla de inicio del vendedor, luego de Registrarse o Iniciar sesion:
+// Vista de la pantalla de inicio del cliente, luego de Registrarse o Iniciar sesion:
 @Composable
-fun SellerHomeScreen(){
+fun CustomerHomeScreen() {
     Box(
         modifier = Modifier
             .fillMaxSize(),
@@ -18,9 +18,10 @@ fun SellerHomeScreen(){
     )
     {
         Text(
-            text = "Home Seller Screen",
+            text = "Home Customer Screen",
             style = MaterialTheme.typography.headlineLarge
         )
     }
+
 
 }

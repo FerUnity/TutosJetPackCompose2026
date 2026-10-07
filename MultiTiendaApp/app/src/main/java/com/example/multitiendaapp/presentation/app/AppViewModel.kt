@@ -13,7 +13,7 @@ import javax.inject.Inject
 //En la carpeta app iran los archivos que tienen que ver con la aplicacion en si,
 // o sea con la globalidad de la app y no con las pantallas.
 
-//Este viewmodel sera global de la app para det a que pantalla entrara el ususario cuando inicie la app.
+//Este viewmodel sera global de la app para det a que pantalla entrara el ususario cuando inicie la app, segun su rol.
 //O sea si el usuario tiene una sesion activa lo enviara a la pantalla de home de seller o customer segun su rol.
 //Y si no tiene sesion activa lo enviara a la pantalla de login.
 
@@ -39,7 +39,7 @@ class AppViewModel @Inject constructor(
     }
 
 
-    //Creamos una fun que verifique si el usuario esta logueado o no, y que rol:
+    //Creamos una fun que verifique si el usuario esta logueado o no, y cual es su rol:
     private fun checkSession() {
 //        Lanzamos una corrutinba:
         viewModelScope.launch {
@@ -50,8 +50,8 @@ class AppViewModel @Inject constructor(
 //            y lo enviamos segun su valor(_startDestination.value),
 //            a la pantalla de home de seller o customer segun su rol, usamos when:
             _startDestination.value = when (user?.role) {
-                "CUSTOMER" -> AppRoute.CustomerHome.route
-                "SELLER" -> AppRoute.SellerHome.route
+                "CUSTOMER" -> AppRoute.CustomerRoot.route
+                "SELLER" -> AppRoute.SellerRoot.route
 //               Ahora si no es seller o customer, lo enviamos a la pantalla de login:
                 else -> AppRoute.Login.route
 

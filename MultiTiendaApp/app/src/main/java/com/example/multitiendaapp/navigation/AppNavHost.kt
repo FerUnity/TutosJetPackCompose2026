@@ -7,7 +7,6 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import com.example.multitiendaapp.presentation.customerHome.CustomerHomeScreen
 import com.example.multitiendaapp.presentation.login.LoginScreen
 import com.example.multitiendaapp.presentation.login.LoginViewModel
 import com.example.multitiendaapp.presentation.registerCustomer.RegisterCustomerScreen
@@ -17,7 +16,6 @@ import com.example.multitiendaapp.presentation.registerSeller.RegisterSellerView
 import com.example.multitiendaapp.presentation.registerStore.RegisterStoreScreen
 import com.example.multitiendaapp.presentation.registerStore.RegisterStoreViewModel
 import com.example.multitiendaapp.presentation.selectRole.SelectRoleScreen
-import com.example.multitiendaapp.presentation.sellerHome.SellerHomeScreen
 
 //Este sera el mapa de navegacion de la app.
 // Aca definimos cual sera la pantalla inicial en mostrarse y cuales seran las demas,
@@ -33,6 +31,10 @@ fun AppNavHost(navController: NavHostController, startDestination: String) {
     // que proviene de AppRoute.kt el cual la define segun el rol del usuario, o bien sera Login.
     ) {
 //        Aca definimos las vistas y los param para navegar a ellas:
+     /*   composable("login") {
+        }
+        O bien en vez de escribir el nombre de la vista, podemos usar el objeto data object Login y su ruta, asi:
+        */
         composable(AppRoute.Login.route) {
 //            Creamos el viewmodel para la pantalla de Login usando hiltViewModel()
             //y lo usaremos como parametro de la fun composable LoginScreen():
@@ -47,10 +49,11 @@ fun AppNavHost(navController: NavHostController, startDestination: String) {
                 onGoToSelectRole = { navController.navigate(AppRoute.SelectRole.route) },
 //                Ademas necesitamos navegar a la pantalla de Home segun el Rol(Seller o Customer) del usuario:
                 onNavigateByRol = { role ->
-//                    Con when evaluamos el rol del usuario y navegamos a la pantalla correspondiente:
+//                    Con when evaluamos el rol del usuario y navegamos a la pantalla correspondiente,
+                    //  CustomerRoot o SellerRoot:
                    when (role) {
                        "CUSTOMER" -> {
-                           navController.navigate(AppRoute.CustomerHome.route) {
+                           navController.navigate(AppRoute.CustomerRoot.route) {
                                popUpTo(AppRoute.Login.route) {
                                    inclusive = true
                                    //Esto es para que no se pueda volver a la pantalla de Login,
@@ -58,7 +61,7 @@ fun AppNavHost(navController: NavHostController, startDestination: String) {
                            }
                        }
                        "SELLER" -> {
-                           navController.navigate(AppRoute.SellerHome.route) {
+                           navController.navigate(AppRoute.SellerRoot.route) {
                                popUpTo(AppRoute.Login.route) {
                                    inclusive = true
                                    //Esto es para que no se pueda volver a la pantalla de Login,
@@ -115,7 +118,7 @@ fun AppNavHost(navController: NavHostController, startDestination: String) {
 //                Aca pasamos como argumento una fun onNavigateHome, que nos permite navegar a la pantalla de SellerHomeScreen,
 //                luego de registrarse:
                 onNavigateHome = {
-                    navController.navigate(AppRoute.SellerHome.route) {
+                    navController.navigate(AppRoute.SellerRoot.route) {
                         popUpTo(AppRoute.RegisterStore.route) {
                             inclusive = true
                         }
@@ -126,10 +129,11 @@ fun AppNavHost(navController: NavHostController, startDestination: String) {
 
 
 
-//        Pantalla de SellerHomeScreen, luego de Registrarse o Iniciar sesion:
-        composable(AppRoute.SellerHome.route) {
+//        Pantalla de SellerHomeScreen, luego de Registrarse o Iniciar sesion.
+//        NO VA porque estara dentro del contenedor de SellerRoot:
+     /*   composable(AppRoute.SellerHome.route) {
             SellerHomeScreen()
-        }
+        }*/
 
 
 
@@ -148,10 +152,10 @@ fun AppNavHost(navController: NavHostController, startDestination: String) {
                 onBack = { navController.popBackStack() },
 
 //                Ahora pasamos como argumento una fun Unit() onNavigateHome(),
-//                que nos permite navegar a la pantalla de CustomerHomeScreen.kt,
+//                que nos permite navegar a la pantalla de CustomerRoot.kt,
 //                luego de registrarse:
                 onNavigateHome = {
-                    navController.navigate(AppRoute.CustomerHome.route) {
+                    navController.navigate(AppRoute.CustomerRoot.route) {
 //                        Luego para que no se pueda volver a la pantalla de RegisterCustomer, luego de registrarse,
                         //hacemos asi:
                         popUpTo(AppRoute.RegisterCustomer.route) {
@@ -162,10 +166,11 @@ fun AppNavHost(navController: NavHostController, startDestination: String) {
             )
         }
 
-//        Pantalla de CustomerHomeScreen, luego de Registrarse o Iniciar sesion:
-        composable(AppRoute.CustomerHome.route) {
+//        Pantalla de CustomerHomeScreen, luego de Registrarse o Iniciar sesion.
+    //        NO VA porque estara dentro del contenedor de CustomerRoot:
+      /*  composable(AppRoute.CustomerHome.route) {
             CustomerHomeScreen()
-        }
+        }*/
 
     }
 

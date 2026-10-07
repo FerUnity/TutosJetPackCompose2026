@@ -43,5 +43,18 @@ sealed class AppRoute(val route: String) {
 //    Pantalla de inicio del vendedor, luego de Registrarse o Iniciar sesion:
     data object SellerHome : AppRoute("seller_home")
 
+//    Creamos 2 nuenas rutas que serviran como contenedores de navegacion que contendran las pantallas de inicio de vendedor y cliente,
+//    luego de registrarse o iniciar sesion, para navegar entre pantallas:
+    data object CustomerRoot : AppRoute("customer_root")
+
+    data object SellerRoot : AppRoute("seller_root")
+
+//    Creamos 2 nuevas rutas para las tiendas:
+    data object CustomerStores : AppRoute("customer_store")
+//    Para que el cliente pueda ver las tiendas registradas de los vendedores,
+
+    data object SellerCategories : AppRoute("seller_categories")
+//    Para que el vendedor pueda ver las categorias de las tiendas registradas,
+
 
 }
