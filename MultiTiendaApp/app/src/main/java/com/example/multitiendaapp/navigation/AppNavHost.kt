@@ -7,6 +7,7 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import com.example.multitiendaapp.presentation.customer.root.CustomerRootScreen
 import com.example.multitiendaapp.presentation.login.LoginScreen
 import com.example.multitiendaapp.presentation.login.LoginViewModel
 import com.example.multitiendaapp.presentation.registerCustomer.RegisterCustomerScreen
@@ -16,6 +17,7 @@ import com.example.multitiendaapp.presentation.registerSeller.RegisterSellerView
 import com.example.multitiendaapp.presentation.registerStore.RegisterStoreScreen
 import com.example.multitiendaapp.presentation.registerStore.RegisterStoreViewModel
 import com.example.multitiendaapp.presentation.selectRole.SelectRoleScreen
+import com.example.multitiendaapp.presentation.seller.root.SellerRootScreen
 
 //Este sera el mapa de navegacion de la app.
 // Aca definimos cual sera la pantalla inicial en mostrarse y cuales seran las demas,
@@ -165,6 +167,16 @@ fun AppNavHost(navController: NavHostController, startDestination: String) {
                 }
             )
         }
+
+//        Registramos las pantallas root de cliente y vendedor:
+        composable(AppRoute.CustomerRoot.route) {
+            CustomerRootScreen()
+        }
+
+        composable(AppRoute.SellerRoot.route) {
+            SellerRootScreen()
+        }
+
 
 //        Pantalla de CustomerHomeScreen, luego de Registrarse o Iniciar sesion.
     //        NO VA porque estara dentro del contenedor de CustomerRoot:

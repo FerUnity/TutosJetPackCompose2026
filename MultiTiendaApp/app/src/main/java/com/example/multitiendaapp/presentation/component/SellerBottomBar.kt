@@ -2,6 +2,7 @@ package com.example.multitiendaapp.presentation.component
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
@@ -13,21 +14,21 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.multitiendaapp.navigation.AppRoute
 
 @Composable
-fun CustomerBottomBar(
+fun SellerBottomBar(
     navController: NavController
-) {
-//    Creamos una var que almacene la ruta de la pantalla actual:
+){
+    //    Creamos una var que almacene la ruta de la pantalla actual:
     val currentRoute = navController
         .currentBackStackEntryAsState()
         .value
         ?.destination
         ?.route
 
-//    Creamos una lista de rutas(2: CustomerHome y CustomerStores) que rep cada item del boton bar,
+//    Creamos una lista de rutas(2: SellerHome y SellerCategories) que rep cada item del boton bar,
 //    en que cada elemento es una pantalla de AppRoute:
     val items = listOf(
-        AppRoute.CustomerHome,
-        AppRoute.CustomerStores
+        AppRoute.SellerHome,
+        AppRoute.SellerCategories
     )
 
 //    Creamos el NavigationBar que es un contenedor visual del bottom bar:
@@ -51,16 +52,16 @@ fun CustomerBottomBar(
 //               signamos el icono de cada boton:
                 icon = {
                     when (item) {
-                        AppRoute.CustomerHome ->
+                        AppRoute.SellerHome ->
                             Icon(
                                 imageVector = Icons.Default.Home,
                                 contentDescription = "Home"
                             )
 
-                        AppRoute.CustomerStores ->
+                        AppRoute.SellerCategories ->
                             Icon(
-                                imageVector = Icons.Default.Star,
-                                contentDescription = "Stores"
+                                imageVector = Icons.Default.Menu,
+                                contentDescription = "Categories"
                             )
 
                         else -> {}
@@ -70,12 +71,12 @@ fun CustomerBottomBar(
 //                Ahora asignamos el label de cada boton:
                 label = {
                     when (item) {
-                        AppRoute.CustomerHome -> {
+                        AppRoute.SellerHome -> {
                             Text(text = "Inicio")
                         }
 
-                        AppRoute.CustomerStores -> {
-                            Text(text = "Tiendas")
+                        AppRoute.SellerCategories -> {
+                            Text(text = "Categorias")
                         }
 
                         else -> {}
