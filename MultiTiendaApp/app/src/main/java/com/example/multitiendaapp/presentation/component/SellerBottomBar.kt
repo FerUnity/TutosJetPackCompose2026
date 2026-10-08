@@ -3,7 +3,6 @@ package com.example.multitiendaapp.presentation.component
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -24,11 +23,11 @@ fun SellerBottomBar(
         ?.destination
         ?.route
 
-//    Creamos una lista de rutas(2: SellerHome y SellerCategories) que rep cada item del boton bar,
+//    Creamos una lista de rutas(2: SellerHome y SellerCategoriesList) que rep cada item del boton bar,
 //    en que cada elemento es una pantalla de AppRoute:
     val items = listOf(
         AppRoute.SellerHome,
-        AppRoute.SellerCategories
+        AppRoute.SellerCategoriesList
     )
 
 //    Creamos el NavigationBar que es un contenedor visual del bottom bar:
@@ -58,7 +57,7 @@ fun SellerBottomBar(
                                 contentDescription = "Home"
                             )
 
-                        AppRoute.SellerCategories ->
+                        AppRoute.SellerCategoriesList ->
                             Icon(
                                 imageVector = Icons.Default.Menu,
                                 contentDescription = "Categories"
@@ -75,7 +74,7 @@ fun SellerBottomBar(
                             Text(text = "Inicio")
                         }
 
-                        AppRoute.SellerCategories -> {
+                        AppRoute.SellerCategoriesList -> {
                             Text(text = "Categorias")
                         }
 

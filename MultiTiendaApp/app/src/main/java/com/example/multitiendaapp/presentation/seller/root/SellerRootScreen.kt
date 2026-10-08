@@ -9,7 +9,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.multitiendaapp.navigation.AppRoute
 import com.example.multitiendaapp.presentation.component.SellerBottomBar
-import com.example.multitiendaapp.presentation.seller.categories.SellerCategoriesScreen
+import com.example.multitiendaapp.presentation.seller.categories.form.SellerCategoryFormScreen
+import com.example.multitiendaapp.presentation.seller.categories.list.SellerCategoriesScreen
 import com.example.multitiendaapp.presentation.seller.home.SellerHomeScreen
 
 //Este composable se invoca cuando el usuario registrado es un vendedor.
@@ -36,15 +37,31 @@ fun SellerRootScreen() {
             modifier = Modifier.padding(paddingValues)
         ) {
             //  Aca registramos las pantallas con sus rutas, que queremos navegar entre cuando el ususario registrado es un vendedor,
-            //  las pantallas son SellerHomeScreen y SellerCategoriesScreen:
+            //  las pantallas son SellerHomeScreen y SellerCategoriesScreen, por ahora:
+
+            //Pantalla de inicio del vendedor, luego de Registrarse o Iniciar sesion:
             composable(AppRoute.SellerHome.route) {
-                //                Y que se pinte la pantalla SellerHomeScreen() que creamos como vista:
+                //Y que se pinte la pantalla SellerHomeScreen() que creamos como vista,
+                // que es la bienvenida del vendedor:
                 SellerHomeScreen()
             }
 
-            composable(AppRoute.SellerCategories.route) {
-                //                Y que se pinte la pantalla SellerCategoriesScreen() que creamos como vista:
-                SellerCategoriesScreen()
+//            Pantalla donde se mostraran las categorias de las tiendas registradas:
+            composable(AppRoute.SellerCategoriesList.route) {
+                // Y que se pinte la pantalla SellerCategoriesScreen() que creamos como vista,
+                // en donde se mostraran las categorias de las tiendas registradas:
+                SellerCategoriesScreen(
+//                    Creamos un callback para llamar a la fun composable SellerCategoryFormScreen() de mas abajo,
+//                    que es para ir al formulario de creacion de categorias:
+                    onGoToForm = {
+                        navController.navigate(AppRoute.SellerCategoryForm.route)
+                    }
+                )
+            }
+
+//            Ahora agregamos la vista del formulario de creacion de categorias:
+            composable(AppRoute.SellerCategoryForm.route) {
+                SellerCategoryFormScreen()
             }
         }
     }
