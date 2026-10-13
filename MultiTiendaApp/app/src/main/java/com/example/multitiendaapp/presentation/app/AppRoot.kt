@@ -49,7 +49,7 @@ fun AppRoot(
     val navController = rememberNavController()
 
 //    Ahora con AppNavHost() que es el que nos permite navegar entre pantallas,
-//    le pasamos el navController y el startDestination:
+//    le pasamos el navController y el startDestination seleccionado segun el Rol del usuario:
     AppNavHost(
         navController = navController,
         startDestination = startDestination!!

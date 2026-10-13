@@ -8,6 +8,8 @@ import kotlinx.coroutines.tasks.await
 //En esta clase es donde se implementara la logica real de las fun declaradas en la interfaz StoreRepository.kt
 // respecto a la autenticacion del usuario con FireBase y Firestore.
 //Entonces aca se implementan las fun declaradas en la interfaz StoreRepository.kt
+//// o sea que en la capa de domain se define lo que se quiere hacer(contrato)
+//// y en la capa data se implementa la logica real de las fun declaradas en la capa de la interfaz.
 class StoreRepoImplem(
     //    Ahora hacemos la injeccion de dependencias con FirebaseFirestore(de StoreRepositoryModule), en el constructor de la clase StoreRepoImplem:
     private val firestore: FirebaseFirestore // Para acceder a la base de datos de FireStore

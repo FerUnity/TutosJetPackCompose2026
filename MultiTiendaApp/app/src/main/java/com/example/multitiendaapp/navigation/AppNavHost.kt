@@ -20,32 +20,36 @@ import com.example.multitiendaapp.presentation.selectRole.SelectRoleScreen
 import com.example.multitiendaapp.presentation.seller.root.SellerRootScreen
 
 //Este sera el mapa de navegacion de la app.
-// Aca definimos cual sera la pantalla inicial en mostrarse y cuales seran las demas,
-// de las pantallas que definimos en la clase AppRoute.
-//Definimos la fun composable de navegacion de la app que se llamara AppNavHost.
-//Esta fun se llama desde la clase MainActivity.kt
+// Aca definimos cual sera la pantalla inicial en mostrarse y las demas pantallas que se mostraran,
+// las cuales definimos en la clase AppRoute.kt.
+
+//Entonces definimos la fun composable de navegacion de la app que se llamara AppNavHost.
+//Esta fun se llama desde la clase AppRoot.kt, la cual define la pantalla inicial de la app,
+// segun el rol del usuario, o bien sera Login.
 @Composable
 fun AppNavHost(navController: NavHostController, startDestination: String) {
 //    Definimos la pantalla inicial con su ruta, la cual sera Login:
     NavHost(
         navController = navController,
         startDestination = startDestination //Aca pasamos la ruta de la pantalla inicial
-    // que proviene de AppRoute.kt el cual la define segun el rol del usuario, o bien sera Login.
+    // que proviene de AppRoot.kt el cual la define segun el rol del usuario, o bien sera Login.
     ) {
 //        Aca definimos las vistas y los param para navegar a ellas:
      /*   composable("login") {
         }
-        O bien en vez de escribir el nombre de la vista, podemos usar el objeto data object Login y su ruta, asi:
-        */
+              */
+//       Ahora, en vez de escribir el nombre de la Ruta de la pantalla que queremos ir,
+        //     usamos el objeto data object Login y su ruta, definidas en AppRoute.com
+        //       Y luego definimos la fun composable que queremos que se muestre con esa ruta:
         composable(AppRoute.Login.route) {
 //            Creamos el viewmodel para la pantalla de Login usando hiltViewModel()
             //y lo usaremos como parametro de la fun composable LoginScreen():
             val viewModel: LoginViewModel = hiltViewModel()
 
-//            Llamamos a la fun composable que representa esa ruta: LoginScreen()
+//           Entonces llamamos a la fun composable que representa esa ruta: LoginScreen()
             LoginScreen(
                 viewModel = viewModel,
-//                Aca necesitamos llegar a la pantalla de SelectRole,
+//                Aca necesitamos llegar a la pantalla de seleccion de Rol: SelectRole,
 //                para ello pasamos el navController para navegar a la pantalla de SelectRole.
 //                Para lo cual creamos una fun o callback que se llamara onGoToSelectRole:
                 onGoToSelectRole = { navController.navigate(AppRoute.SelectRole.route) },
@@ -81,6 +85,7 @@ fun AppNavHost(navController: NavHostController, startDestination: String) {
 
 //        Pantalla de SelectRole:
         composable(AppRoute.SelectRole.route) {
+//            Definimos que esa ruta sea la de SelectRole, correspondiente a la fun composable SelectRoleScreen():
             SelectRoleScreen(
 //                Aca podemos ir a las pantallas de RegisterSeller o RegisterCustomer,
 //                para ello necesitamos pasarle el navController para navegar a las 2 pantallas:

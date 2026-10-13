@@ -28,7 +28,8 @@ fun SelectRoleScreen(
         verticalArrangement = androidx.compose.foundation.layout.Arrangement.Center
     ) {
 //        Creamos una tarjeta o Card de registro de vendedor:
-        //   Que sea clickable para llegar va la pantalla de registro del vendedor
+        //   Que sea clickable para que el ususario seleccione el rol de vendedor,
+        //   para llegar va la pantalla de registro del vendedor
         //   o RegisterSellerScreen():
         Card(
             modifier = Modifier
@@ -52,8 +53,9 @@ fun SelectRoleScreen(
 
         }
 
-//        Creamos una tarjeta o Card de registro de cliente o comprador:
-//        //   Que sea clickable para llegar va la pantalla de registro del cliente
+//        Creamos otra tarjeta o Card de registro de cliente o comprador:
+//        //   Que sea clickable para que el ususario seleccione el rol de cliente,
+//        para llegar a la pantalla de registro del cliente
 //        //   o RegisterCustomerScreen():
         Card(
             modifier = Modifier
