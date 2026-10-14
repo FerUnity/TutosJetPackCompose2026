@@ -14,7 +14,7 @@ import com.example.multitiendaapp.navigation.AppRoute
 
 @Composable
 fun SellerBottomBar(
-    navController: NavController
+    navController: NavController,
 ){
     //    Creamos una var que almacene la ruta de la pantalla actual:
     val currentRoute = navController
@@ -27,7 +27,7 @@ fun SellerBottomBar(
 //    en que cada elemento es una pantalla de AppRoute:
     val items = listOf(
         AppRoute.SellerHome,
-        AppRoute.SellerCategoriesList
+        AppRoute.SellerCategoriesList,
     )
 
 //    Creamos el NavigationBar que es un contenedor visual del bottom bar:
@@ -54,13 +54,13 @@ fun SellerBottomBar(
                         AppRoute.SellerHome ->
                             Icon(
                                 imageVector = Icons.Default.Home,
-                                contentDescription = "Home"
+                                contentDescription = "Home",
                             )
 
                         AppRoute.SellerCategoriesList ->
                             Icon(
                                 imageVector = Icons.Default.Menu,
-                                contentDescription = "Categories"
+                                contentDescription = "Categories",
                             )
 
                         else -> {}
@@ -80,7 +80,7 @@ fun SellerBottomBar(
 
                         else -> {}
                     }
-                }
+                },
             )
         }
     }

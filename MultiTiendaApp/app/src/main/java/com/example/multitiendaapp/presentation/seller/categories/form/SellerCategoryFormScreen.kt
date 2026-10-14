@@ -23,7 +23,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.example.multitiendaapp.R
 
-//Esta vista hay registrarla en contenedor de SellerRootScreen()
+//Este formulario es para que  el usuario VENDEDOR, pueda agregar categorias a las tiendas,
+// la parte logica de este formulario esta en SellerCategoryFormViewModel.kt,
+// Esta vista hay registrarla en contenedor de SellerRootScreen()
 @Composable
 fun SellerCategoryFormScreen(){
     Box(
@@ -68,7 +70,7 @@ fun SellerCategoryFormScreen(){
                     enabled = true //Para habilitar el campo de texto
                 )
 
-//                Boton para
+//                Boton para agregar la categoria:
                 Button(
                     modifier = Modifier.fillMaxWidth().height(50.dp),
                     onClick = { /*TODO*/ },

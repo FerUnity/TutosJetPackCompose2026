@@ -14,7 +14,7 @@ import com.example.multitiendaapp.presentation.seller.categories.list.SellerCate
 import com.example.multitiendaapp.presentation.seller.home.SellerHomeScreen
 
 //Este composable se invoca cuando el usuario registrado es un vendedor.
-// Este composable es el contenedor de la pantalla de inicio del cliente
+// Este composable es el contenedor de la pantalla de inicio del vendedor,
 // y lo que hace es crear un navController local para navegar entre pantallas,
 // y un Scaffold para mostrar el BottomBar donde se muestran las pestañas SellerHome y SellerCategories.
 // La idea es que cada vez que se presione una de las pestañas, se navegue a la pantalla correspondiente.
