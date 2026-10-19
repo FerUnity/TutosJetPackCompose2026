@@ -4,7 +4,7 @@ import com.example.multitiendaapp.core.model.Store
 
 //En una interfaz solo se definen lo que hara la app por ejemplo: login, register, logout, etc,
 // pero no los pasos logicos de como se hara.
-// por eso se dice que la interfaz es un contrato que se debe cumplir.
+// por eso se dice que la interfaz es un contrato que se debe cumplir, la parte logica se hace en el repositorio.
 interface StoreRepository {
 //    Creamos una fun para crear o registrar una tienda:
     suspend fun createStore(

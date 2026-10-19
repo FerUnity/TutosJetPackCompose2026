@@ -25,7 +25,7 @@ import com.example.multitiendaapp.R
 
 //Este formulario es para que  el usuario VENDEDOR, pueda agregar categorias a las tiendas,
 // la parte logica de este formulario esta en SellerCategoryFormViewModel.kt,
-// Esta vista hay registrarla en contenedor de SellerRootScreen()
+// Esta vista hay que registrarla en contenedor de SellerRootScreen()
 @Composable
 fun SellerCategoryFormScreen(){
     Box(
