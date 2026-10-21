@@ -38,14 +38,14 @@ fun SellerCategoryFormScreen(
     onBack: () -> Unit
 ) {
 //    Creamos un estado para escuchar u observar el estado del viewModel de esta pantalla de creacion de categorias,
-    //    esto es para que haya un cambio en esta vista se recomponga de inmediato:
+    //    esto es para que cuando haya un cambio en esta vista, se recomponga de inmediato:
     val state by viewModel.uiState.collectAsStateWithLifecycle()
 
 //    Ademas un contexto para identificar esta app frente al OS Android,
 //    y asi mostrar mensajes Toast, navegar a otras pantallas, etc:
     val context = LocalContext.current
 
-//    Creramos un Launcheffect para escuchar los efectos que vienen del viewModel, como
+//    Creamos un Launcheffect para escuchar los efectos que vienen del viewModel, como
 //    ShowMessage y NavigateBack, para mostrar mensajes Toast y navegar a otras pantallas, etc:
     LaunchedEffect(key1 = Unit) {
         viewModel.effect.collect { effect ->

@@ -12,12 +12,13 @@ import com.example.multitiendaapp.navigation.AppRoute
 import com.example.multitiendaapp.presentation.component.SellerBottomBar
 import com.example.multitiendaapp.presentation.seller.categories.form.SellerCategoryFormScreen
 import com.example.multitiendaapp.presentation.seller.categories.form.SellerCategoryFormViewModel
+import com.example.multitiendaapp.presentation.seller.categories.list.SellerCategoriesListViewModel
 import com.example.multitiendaapp.presentation.seller.categories.list.SellerCategoriesScreen
 import com.example.multitiendaapp.presentation.seller.home.SellerHomeScreen
 
 //Este composable se invoca cuando el usuario registrado es un vendedor.
-// Este composable es el contenedor de la pantalla de inicio del vendedor
-// y de las pantallas que tienen que ver connel vendedor,
+// Este composable es el contenedor de las pantallas que tienen que ver con el vendedor,
+// como la pantalla de inicio del vendedor, la pantalla de lista de categorias y la pantalla de creacion de categorias.
 // y lo que hace es crear un navController local para navegar entre esas pantallas,
 // y un Scaffold para mostrar el BottomBar donde se muestran las pestañas SellerHome y SellerCategories.
 // La idea es que cada vez que se presione una de las pestañas, se navegue a la pantalla correspondiente.
@@ -54,11 +55,19 @@ fun SellerRootScreen() {
                 SellerHomeScreen()
             }
 
-//            Pantalla donde se mostraran las categorias de las tiendas registradas:
-            composable(AppRoute.SellerCategoriesList.route) {
-                // Y que se pinte la pantalla SellerCategoriesScreen() que creamos como vista,
-                // en donde se mostraran las categorias de las tiendas registradas:
+//            Pantalla donde se mostrara la lista de categorias, segun cada tienda registrada:
+            composable(AppRoute.SellerCategoriesList.route) { backStackEntry ->
+                val viewModel: SellerCategoriesListViewModel = hiltViewModel(backStackEntry)
+                //El backStackEntry es un objeto que representa la entrada en la pila o historial de navegación.
+                // El hiltViewModel() es una función que se utiliza para obtener un ViewModel desde Hilt
+                // y asociarlo a una entrada en la pila de navegación.
+
+
+                // Aca pintamos la pantalla SellerCategoriesScreen() que creamos como vista,
+                // en donde se mostraran la lista de categorias por tienda registrada:
                 SellerCategoriesScreen(
+//                    Usamos al viewModel como parametro para obtener la lista de categorias, para mostrarlos en la pantalla:
+                    viewModel = viewModel,
 //                    Creamos un callback para llamar a la fun composable SellerCategoryFormScreen() de mas abajo,
 //                    que es para ir al formulario de creacion de categorias:
                     onGoToForm = {
@@ -71,7 +80,8 @@ fun SellerRootScreen() {
             composable(AppRoute.SellerCategoryForm.route) { backStackEntry ->
                 val viewModel: SellerCategoryFormViewModel = hiltViewModel(backStackEntry)
 //                El backStackEntry es un objeto que representa la entrada en la pila o historial de navegación.
-//                El hiltViewModel() es una función que se utiliza para obtener un ViewModel desde Hilt y asociarlo a una entrada en la pila de navegación.
+//                El hiltViewModel() es una función que se utiliza para obtener un ViewModel desde Hilt
+//                y asociarlo a una entrada en la pila de navegación.
 
                 SellerCategoryFormScreen(
                     viewModel = viewModel,

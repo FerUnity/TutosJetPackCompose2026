@@ -14,7 +14,7 @@ interface StoreRepository {
 // Por eso se usa un objeto Unit (Result<Unit>), y no Store (Result<Store>).
 
 //    Creamos otra fun para encontrar una tienda especifica segun el id del vendedor, podria ser nulo:
-    suspend fun getStoreBySellerId(sellerId: String) : Result<Store?>
+    suspend fun getStoreBySeller(sellerId: String) : Result<Store?>
 
 //    fun para actualizar datos de una tienda existente. Hay que poner un parametro de tipo Store:
     suspend fun updateStore(store: Store) : Result<Unit> // Solo queremos saber si la actualizacion fue exitosa o no.

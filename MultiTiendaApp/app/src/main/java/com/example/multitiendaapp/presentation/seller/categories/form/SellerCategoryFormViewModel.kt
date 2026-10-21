@@ -139,7 +139,7 @@ class SellerCategoryFormViewModel @Inject constructor(
             }
 
 //            Una vez obtenido el usuario vendedor autenticado, obtenemos la tienda que le corresponde:
-            val result = storeRepository.getStoreBySellerId(sellerId)
+            val result = storeRepository.getStoreBySeller(sellerId)
             result.onSuccess { store ->
                 if (store == null) {
 //                    Si la tienda no existe, enviamos un mensaje de error y dejamos de cargar:

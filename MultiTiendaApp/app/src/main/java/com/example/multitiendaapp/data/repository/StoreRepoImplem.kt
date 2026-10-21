@@ -92,7 +92,7 @@ class StoreRepoImplem(
 
     // Sobreescribimos la fun getStoreBySellerId() de la interfaz StoreRepository.kt,
 // para obtener una tienda por el id del vendedor:
-    override suspend fun getStoreBySellerId(sellerId: String): Result<Store?> =
+    override suspend fun getStoreBySeller(sellerId: String): Result<Store?> =
 //            Esta fun devuelve un objeto de tipo Result<Store?>, segun el id del vendedor. pero puede ser nulo:
         runCatching {
             val sellerIdTrimmed = sellerId.trim() //Este es el id del vendedor.
