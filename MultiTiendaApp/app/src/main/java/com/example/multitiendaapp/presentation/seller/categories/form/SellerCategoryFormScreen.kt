@@ -29,7 +29,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.multitiendaapp.R
 
-//Este formulario es para que  el usuario VENDEDOR, pueda agregar categorias a las tiendas,
+//Este formulario es para que el usuario VENDEDOR, pueda CREAR categorias a las tiendas,
+// quedando registradas en la BBDD firebase:
 // la parte logica de este formulario esta en SellerCategoryFormViewModel.kt,
 // Esta vista hay que registrarla en contenedor de SellerRootScreen()
 @Composable
@@ -80,11 +81,12 @@ fun SellerCategoryFormScreen(
 //            Column para organizar verticalmente los elementos de la tarjeta:
             Column(
                 modifier = Modifier.padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)//Para dar espacio vertical entre los elementos hijos de la columna
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            //Para dar espacio vertical de 12.dp, entre los elementos hijos de la columna
             ) {
                 Text(
                     modifier = Modifier.align(Alignment.CenterHorizontally),
-                    text = "Crear nueva categoria",
+                    text = "Crear categoria",
                     style = MaterialTheme.typography.titleMedium
                 )
 

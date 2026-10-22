@@ -251,6 +251,9 @@ class SellerCategoryFormViewModel @Inject constructor(
 //            Y generamos un efecto para navegar a la pantalla anterior:
                 _effect.emit(SellerCategoryFormEffect.NavigateBack)
 
+//                Finalmente queremos que nos direccione a la pantalla de lista de categorias: SellerCategoriesScreen.kt:
+            /*    navController.navigate(AppRoute.SellerCategoriesList.route)*/
+
 //            Ahora si fallo la creacion de la categoria,
                 //            nos devuelve un error,
                 //            entonces hacemos una copia del estado actual de la pantalla de creacion de categorias, y
@@ -263,7 +266,7 @@ class SellerCategoryFormViewModel @Inject constructor(
                         errorMessage = error.message ?: "No se pudo crear la categoria"
                     )
                 }
-//            Y emitimos un efecto para mostrar el error:
+//            Y ademas emitimos un efecto para mostrar el error:
                 _effect.emit(
                     SellerCategoryFormEffect.ShowMessage(
                         error.message ?: "No se pudo crear la categoria"

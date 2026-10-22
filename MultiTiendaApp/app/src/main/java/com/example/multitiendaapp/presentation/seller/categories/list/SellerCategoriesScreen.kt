@@ -27,7 +27,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.multitiendaapp.presentation.seller.categories.form.SellerCategoryItem
 
 //Esta vista muestra el listado de las categorias de las tiendas registradas,
-// Esta vista hay que registrarla en contenedor de SellerRootScreen()
+// Esta vista hay que registrarla en el contenedor de SellerRootScreen()
 @Composable
 fun SellerCategoriesScreen(
     viewModel: SellerCategoriesListViewModel,

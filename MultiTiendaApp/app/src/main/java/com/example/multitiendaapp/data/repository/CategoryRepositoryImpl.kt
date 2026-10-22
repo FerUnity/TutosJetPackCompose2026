@@ -3,6 +3,9 @@ package com.example.multitiendaapp.data.repository
 import com.example.multitiendaapp.core.model.Category
 import com.example.multitiendaapp.domain.repository.CategoryRepository
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
 
 //Aca es donde se implementara toda la logica real de las fun declaradas en la interfaz CategoryRepository.kt,
@@ -77,34 +80,91 @@ class CategoryRepositoryImpl(
 
     //    Implementamos ahora la fun que obtiene todas las categorias(Lista de categorias) de una tienda especifica,
 //    segun el id de la tienda:
-    override suspend fun getCategoriesByStore(storeId: String): Result<List<Category>> =
-        runCatching {
-//            Primero limpiamos los espacios en blanco del id de la tienda
+    override fun getCategoriesByStoreFlow(storeId: String): Flow<List<Category>> =
+//        Usamos Flow en vez de Result porque es una lista de categorias dinamica que se debe actualizar en tiempo real:
+        callbackFlow {
+//            Primero limpiamos los espacios en blanco del id de la tienda:
             val storeIdTrimmed = storeId.trim()
+            //            Luego validamos que el id de la tienda no este vacio:
+            if (storeIdTrimmed.isBlank()) {
+//                Enviamos una lista vacia al callbackFlow si el id de la tienda esta vacio:
+                trySend(emptyList())
+                return@callbackFlow
+                //O sea salimos de la fun callbackFlow para evitar cobsultas innecesarias a la BBDD Firestore..
+            }
+
+//            Fuera del if creamos un listener para la coleccion de categorias en Firestore:
+            val registration = categoriesRef()
+//                Aca creamos una consulta a la BBDD Firestore, para obtener la lista de categorias de una tienda especifica
+                .whereEqualTo("storeId", storeIdTrimmed)
+
+                //Ahora registramos un listener en Firestore, que se quedara escuchando cualquier cambio en la coleccion de categorias,
+                //por ej que se agregue una nueva categoria, o que se elimine una categoria
+                //para que finalmente se actualice la lista de categorias en tiempo real:
+                .addSnapshotListener { snapshot, error ->
+                    if (error != null) {
+                        return@addSnapshotListener
+//               O sea si hay error solo salimos del listener actual para evitar cobsultas innecesarias a la BBDD Firestore..
+                    }
+//                    Que pasa si snapshot es nulo, o sea si no hay categorias disponibles en la tienda,
+//                    enviamos una lista vacia al callbackFlow:
+                    if (snapshot == null) {
+//                     Entonces enviamos una lista vacia al callbackFlow:
+                        trySend(emptyList())
+                        return@addSnapshotListener
+//                        Para salir del listener actual para evitar cobsultas innecesarias a la BBDD Firestore..
+                    }
+
+//                    Ahora convertimos los documentos a objetos de tipo categoria para enviarlos al callbackFlow:
+                    val categories = snapshot.documents.map { doc ->
+                        Category(
+                            id = doc.id,
+                            name = doc.getString("name")
+                                .orEmpty(),//.orEmpty() para conv null a vacio..
+                            storeId = doc.getString("storeId").orEmpty()
+                        )
+
+                    }
+
+                    trySend(categories)
+                }
+            awaitClose {
+                registration.remove()
+            // Removemos el listener cuando se elimine el callbackFlow para evitar leaks de memoria.
+            }
+
+
+//
+
+        }
+    /*        runCatching {
+//            Primero limpiamos los espacios en blanco del id de la tienda
+        val storeIdTrimmed = storeId.trim()
 
 //            Luego validamos que el id de la tienda no este vacio:
-            if (storeIdTrimmed.isBlank()) {
-                throw IllegalArgumentException("El id de la tienda no puede estar vacio")
-            }
+        if (storeIdTrimmed.isBlank()) {
+            throw IllegalArgumentException("El id de la tienda no puede estar vacio")
+        }
 //            Hacemos una consulta a la BBDD Firestore, para obtener la lista de categorias de una tienda especifica
 //          cuyo id de tienda sea = storeIdTrimmed, que es el parametro limpiado de la fun.
 //          snapshot es una variable que almacena el resultado de la consulta a la BBDD Firestore:
-            val snapshot = categoriesRef()
-                .whereEqualTo("storeId", storeIdTrimmed)
-                .get() //get() nos permite obtener los datos de la consulta a la BBDD Firestore.
-                .await() // Esperamos a que se complete la tarea de registro en Firebase sin bloquear el hilo principal de la aplicacion.
+        val snapshot = categoriesRef()
+            .whereEqualTo("storeId", storeIdTrimmed)
+            .get() //get() nos permite obtener los datos de la consulta a la BBDD Firestore.
+            .await() // Esperamos a que se complete la tarea de registro en Firebase sin bloquear el hilo principal de la aplicacion.
 
 //            Luego creamos una lista mutable de categorias,
 //            para almacenar los datos de la consulta que la BBDD Firestore nos devolvio,
 //            cada document representa una categoria
 //            pero esta en formato json, entonces lo convertimos a un objeto Category:
 //            se hace asi:
-            snapshot.documents
-                .mapNotNull { doc ->
-                    doc.toObject(Category::class.java)
-                }
+        snapshot.documents
+            .mapNotNull { doc ->
+                doc.toObject(Category::class.java)
+            }
 
-        }
+    }*/
+
 
     //    Ahora implementamos la fun que actualiza "EL NOMBRE" de una categoria,
 //    que recibe un objeto Category que es la categoria a actualizar:
@@ -156,28 +216,27 @@ class CategoryRepositoryImpl(
                 .await() // Esperamos a que se complete la tarea de registro en Firebase sin bloquear el hilo principal de la aplicacion.
         }
 
-//            Ahora implementamos la fun que obtiene una categoria desde Firestore,
+    //            Ahora implementamos la fun que obtiene una categoria desde Firestore,
 //            segun el id de esa categoria que se recibe como parametro:
-            override suspend fun getCategoryById(categoryId: String): Result<Category?> =
-                runCatching {
-                    //Limpiamos los espacios en blanco del id de la categoria:
-                    val id = categoryId.trim()
-                    //Luego validamos que el id de la categoria no este vacio:
-                    if (id.isBlank()) {
-                        throw IllegalArgumentException("El id de la categoria no puede estar vacio")
-                    }
-                    //Obtenemos un document, que representa la categoria que se quiere obtener, de la consulta a la BBDD Firestore,
-                    // para obtener la categoria con el id que se recibe como parametro.
-                    // doc sera la variable que almacena el resultado de la consulta a la BBDD Firestore,
-                    // document representa la categoria que se quiere obtener, pero esta en formato json,:
-                    val doc = categoriesRef()
-                        .document(id)
-                        .get()
-                        .await() // Esperamos a que se complete la tarea de registro en Firebase sin bloquear el hilo principal de la aplicacion.
+    override suspend fun getCategoryById(categoryId: String): Result<Category?> =
+        runCatching {
+            //Limpiamos los espacios en blanco del id de la categoria:
+            val id = categoryId.trim()
+            //Luego validamos que el id de la categoria no este vacio:
+            if (id.isBlank()) {
+                throw IllegalArgumentException("El id de la categoria no puede estar vacio")
+            }
+            //Obtenemos un document, que representa la categoria que se quiere obtener, de la consulta a la BBDD Firestore,
+            // para obtener la categoria con el id que se recibe como parametro.
+            // doc sera la variable que almacena el resultado de la consulta a la BBDD Firestore,
+            // document representa la categoria que se quiere obtener, pero esta en formato json,:
+            val doc = categoriesRef()
+                .document(id)
+                .get()
+                .await() // Esperamos a que se complete la tarea de registro en Firebase sin bloquear el hilo principal de la aplicacion.
 
-                    //Luego convertimos el documento de la consulta de json a un objeto Category:
-                    doc.toObject(Category::class.java)
-
+            //Luego convertimos el documento de la consulta de json a un objeto Category:
+            doc.toObject(Category::class.java)
 
 
         }

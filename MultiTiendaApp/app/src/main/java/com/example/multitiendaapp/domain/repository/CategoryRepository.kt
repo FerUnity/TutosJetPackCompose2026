@@ -1,6 +1,7 @@
 package com.example.multitiendaapp.domain.repository
 
 import com.example.multitiendaapp.core.model.Category
+import kotlinx.coroutines.flow.Flow
 
 //Una interfaz define todas las operaciones disponibles para una clase,
 // en este caso Category.
@@ -15,9 +16,10 @@ interface CategoryRepository {
 
 //    Creanos otra fun para obtener todas las categorias(lista de categorias) de una tienda, segun el id de la tienda,
     //    esta info se encuentra en la base de datos de FireStore:
-    suspend fun getCategoriesByStore(
+    fun getCategoriesByStoreFlow(
         storeId: String,
-    ): Result<List<Category>> //Devuelve una lista de categorias
+    ): Flow<List<Category>> //Devuelve una Flow de una lista de categorias,
+    // por ende no requiere que sea suspendida.
 
 //    Otra fun para actualizar una categoria, que reciba un objeto Category que es la categoria a actualizar
     //    y devuelva un Result<Unit>: o sea nada.

@@ -100,117 +100,61 @@ class SellerCategoriesListViewModel @Inject constructor(
     val effectNavigate: SharedFlow<SellerCategoriesListEffectNavigate> =
         _effectNavigate.asSharedFlow()
 
-//    Creamos un init que es ejecutado automaticamente cuando se crea la instancia del viewmodel, lo cual se hace desde
+    //    Creamos un init que es ejecutado automaticamente cuando se crea la instancia del viewmodel, lo cual se hace desde
 //    la vista o pantalla de lista de categorias: SellerCategoriesScreen.kt:
     init {
-//        En este caso llamamos a la fun loadAll() para obtener todas las categorias, al inicio de la pantalla de lista de categorias:
-        loadAll()
+
     }
 
-    //    Creamos fun para obtener todas las categorias, esta se invocara desde el init del viewmodel:
-    private fun loadAll() {
-//        Creamos una corrutina para obtener todas las categorias en segundo plano, ligada al ciclo de vida del viewmodel:
+    //Creamos una var bool que nos dira si estamos escuchando las categorias en tiempo real en Firestore,
+// para evitar muchos listener en Firestore: false es que no estamos escuchando, true es que si estamos escuchando:
+    private var isObservingCategories = false
+
+    //    Creamos una fun que estara observando los cambios de las categorias en tiempo real en Firestore, usando Flows
+    private fun observeCategoriesInRealTime() {
+//        Condicion si estamos ya escuchando las categorias en tiempo real en Firestore, en tal caso salimos de esta fun, asi:
+        if (isObservingCategories) return
+
+//    Sino la hacemos true y llamamos a una corrutina que estara observando las categorias en tiempo real en Firestore:
+        isObservingCategories =
+            true //Ahora si estamos escuchando las categorias en tiempo real en Firestore,
+        //    Dentro de una corrutina, actualizamos el estado de la pantalla de lista de categorias: SellerCategoriesScreen.kt:
         viewModelScope.launch {
-//            Actualizamos el estado de la pantalla de lista de categorias, actualizando desde Firebase:
             _uiState.update { current ->
                 current.copy(
-                    listLoading = true, //activamos el estado de carga
-                    errorMessage = null //borramos el mensaje de error si lo habia
+                    listLoading = true,//Estamos cargando las categorias
+                    errorMessage = null
+
                 )
             }
-//            Ahora autenticamos al usuario actual:
+
+//            Ahorsa obtenemos al usuario actual de la autenticacion:
             val user = authRepository.getCurrentUser()
-//            Extraemos el id de ese vendedor, puede ser nulo:
-            val sellerId = user?.uid
-//            Validamos si el usuario no existe, es lo mismo que no este autenticado:
-            if (sellerId.isNullOrBlank()) {
-//             Si no existe, enviamos un mensaje de error y dejamos de cargar:
+//            Obtenemos su id:
+            val sellerUid = user?.uid
+
+//            Validamos que el exista el usuario actual vendedor:
+            if (sellerUid.isNullOrBlank()) {
+//                Actuializamos el estado de la pantalla de lista de categorias: SellerCategoriesScreen.kt:            }
                 _uiState.update { current ->
                     current.copy(
-                        listLoading = false, //dejamos de cargar
-                        errorMessage = "No se encontro el usuario autenticado"
+                        listLoading = false,//ya no estamos cargando las categorias
+                        errorMessage = "No se encontro el usuario actual"
                     )
+
                 }
-//                Y ademas emitimos un efecto con un mensaje de error:
-                _effect.emit(SellerCategoriesListEffect.ShowMessage("No se encontro el usuario autenticado"))
-                return@launch //Y cortamos la ejecucion de la corrutina
-            }
+                //                    EMitimos un efecto de ShowMessage para mostrar un mensaje de error:
+                _effect.emit(SellerCategoriesListEffect.ShowMessage("No se encontro el usuario autencicado"))
 
-//            Ahora si existe el usuario, obtenemos la tienda que le corresponde a ese vendedor segun su id:
-            val storeResult = storeRepository.getStoreBySeller(sellerId)
-//            En caso que sea exitoso que encontramos la tienda, obtenemos las categorias de la tienda encontrada:
-            storeResult.onSuccess { store ->
-//                Primero validamos si la tienda existe:
-                if (store == null) {
-//                    Si no encontramos la tienda, actualizamod el estado de la pantalla de lista de categorias,
-                    // donde enviamos un mensaje de error y dejamos de cargar:
-                    _uiState.update { current ->
-                        current.copy(
-                            listLoading = false, //dejamos de cargar
-                            errorMessage = "Este vendedor no tiene ninguna tienda registrada"
-                        )
-                    }
-//                    Y ademas emitimos un efecto con un mensaje de error:
-                    _effect.emit(SellerCategoriesListEffect.ShowMessage("Este vendedor no tiene ninguna tienda registrada"))
-                    return@onSuccess //Y cortamos la ejecucion de la corrutina
-                }
+                return@launch //Salimos de la corrutina, asi no sigue ejecutando el codigo:
 
-//      Ahora si, fuera del if, implica que si existe una tienda registrada a ese vendedor,
-//      obtenemos las categorias de la tienda encontrada, usando la fun getCategoriesByStore() del repositorio de categorias:
-                val result = categoryRepository.getCategoriesByStore(store.id)
-//            En caso que sea exitoso que encontramos las categorias,
-//            actualizamos con update el estado de la pantalla de lista de categorias, con las categorias encontradas:
-                result.onSuccess { list ->
-                    _uiState.update { current ->
-                        //hacemos una copia del estado actual y actualizamos el estado de la pantalla de lista de categorias:
-                        current.copy(
-                            categories = list, //actualizamos el estado de la pantalla de lista de categorias,
-                            // con la lista de categorias encontradas
-                            listLoading = false, //dejamos de cargar
-                            errorMessage = null //borramos el mensaje de error si lo habia
-                        )
-                    }
-//                    Y emitimos un efecto con un mensaje de exito:
-                    _effect.emit(SellerCategoriesListEffect.ShowMessage("Lista cargada"))
 
-//                    Ahora en caso que sea fallido que no encontramos las categorias, aunque si encontramos la tienda:
-                }.onFailure { error ->
-                    _uiState.update { current ->
-                        //hacemos una copia del estado actual y actualizamos el estado de la pantalla de lista de categorias
-                        current.copy(
-                            listLoading = false, //dejamos de cargar
-                            errorMessage = error.message
-                                ?: "No se pudo obtener la lista de categorias"
-                        )
-                    }
-//                    Y ademas emitimos un efecto con un mensaje de error usando el efecto colateral:
-                    _effect.emit(
-                        SellerCategoriesListEffect.ShowMessage(
-                            error.message ?: "No se pudo obtener la lista de categorias"
-                        )
-                    )
-                }
+            } //Cierre if
 
-//                Ahora si no existe la tienda, es decir, si el usuario no tiene ninguna tienda registrada,
-            }.onFailure { error ->
-//                Actualizamos el estado de la pantalla de lista de categorias,
-                _uiState.update { current ->
-                    //hacemos una copia del estado actual y actualizamos el estado de la pantalla de lista de categorias
-                    current.copy(
-                        listLoading = false, //dejamos de cargar
-                        errorMessage = error.message ?: "No se pudo obtener la Tienda" //OJO
-                    )
-                }
-//                Y ademas emitimos un efecto con un mensaje de error usando el efecto colateral:
-                _effect.emit(
-                    SellerCategoriesListEffect.ShowMessage(
-                        error.message ?: "No se pudo obtener la Tienda"
-                    )
-                )
+//
 
-            }
 
         }
-    } //Aca finaliza la fun loadAll()
-}
 
+    }
+}
