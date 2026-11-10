@@ -33,10 +33,11 @@ data class SellerCategoriesListUiState(
 
 //Creamos una Sealed Interface que representa los eventos que vienen desde la vista de lista de categorias: SellerCategoriesScreen.kt,
 //  hacia este viewmodel:
-
 sealed interface SellerCategoriesListEvent {
-    // creamos un objeto Load que representa el evento de cargar las categorias:
-    data object Load : SellerCategoriesListEvent
+    // creamos un data class que representa el evento de eliminar una categoria:
+    data class DeleteCategory(
+        val category: Category //Aca se recibe la categoria que se quiere eliminar
+    ) : SellerCategoriesListEvent //Aca se indica que este evento es de tipo SellerCategoriesListEvent
 }
 
 //Creamos otro Sealed Interface que representa los efectos colaterales que se producen en la vista de lista de categorias:
@@ -46,13 +47,6 @@ sealed interface SellerCategoriesListEffect {
     data class ShowMessage(
         val message: String
     ) : SellerCategoriesListEffect
-}
-
-//Creamos otra sealed Interface para navegar desde la pantalla de lista de categorias,
-// hacia la pantalla de formulario de creacion de categorias:
-sealed interface SellerCategoriesListEffectNavigate {
-    //data class que repr el efecto que se produce cuando se navega a la pantalla de formulario de creacion de categorias
-    data object NavigateToForm : SellerCategoriesListEffectNavigate
 }
 
 
@@ -93,12 +87,17 @@ class SellerCategoriesListViewModel @Inject constructor(
 //    para que no se pueda editarlo desde la vista:
     val effect: SharedFlow<SellerCategoriesListEffect> = _effect.asSharedFlow()
 
-    //    Ahora creamos el flujo interno para el efecto de navegacion:
-    private val _effectNavigate = MutableSharedFlow<SellerCategoriesListEffectNavigate>()
+//    Creamos una fun encargada de recibir los eventos de la interfaz SellerCategoriesListEvent,
+//    para llamar a las fun correspondientes
+//    y actualizar el estado de la pantalla:
+    fun onEvent(event: SellerCategoriesListEvent) {
+        when (event) {
+            is SellerCategoriesListEvent.DeleteCategory -> {
+                deleteCategory(event.category)
+            }
+        }
+    }
 
-    //    Y ahora creamos el flujo externo para el efecto de navegacion, expuesta en la vista pero solo lectura,
-    val effectNavigate: SharedFlow<SellerCategoriesListEffectNavigate> =
-        _effectNavigate.asSharedFlow()
 
     //    Creamos un init que es ejecutado automaticamente cuando se crea la instancia del viewmodel, lo cual se hace desde
 //    la vista o pantalla de lista de categorias: SellerCategoriesScreen.kt:
@@ -231,6 +230,34 @@ class SellerCategoriesListViewModel @Inject constructor(
                 )
 
             }
+        }
+    }
+
+//    Creamos una nueva fun que se encargara de eliminar una categoria en Firestore
+//    y por ende no la mostrara en la lista de categorias:
+    private fun deleteCategory(category: Category) {
+//        Creamos una corrutina para eliminar la categoria en Firestore:
+        viewModelScope.launch {
+//            Llamamos al repo para hacer la eliminacion de la categoria,
+            //para eso creamos una var que almacene el resultado de la operacion de eliminacion:
+            val result = categoryRepository.deleteCategory(category.id)
+//            Manejamos ese resultado de eliminacion, segun sea exitosos o fallido:
+//            Si fue exitosa:
+            result.onSuccess {
+                //                EMitimos un efecto de ShowMessage para mostrar un mensaje de exito:
+                _effect.emit(SellerCategoriesListEffect.ShowMessage("Categoria eliminada con exito"))
+//                Si fue fallido:
+            }.onFailure {
+                error ->
+                //                EMitimos un efecto de ShowMessage para mostrar un mensaje de error:
+                _effect.emit(
+                    SellerCategoriesListEffect.ShowMessage(
+                        error.message ?: "Error al eliminar la categoria"
+//                        El operador elvis permite mostrar un mensaje por defecto si el mensaje de error es nulo,
+                    )
+                )
+            }
+
         }
     }
 }

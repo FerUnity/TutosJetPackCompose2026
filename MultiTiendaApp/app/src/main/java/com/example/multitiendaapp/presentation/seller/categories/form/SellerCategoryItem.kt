@@ -29,22 +29,24 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.multitiendaapp.core.model.Category
 
-//Este es un componenete grafico (Card) reutilizable que contendra a
-// cada categoria de la lista de categorias almacenada en Firestore,
-// que se mostrara en la pantalla de lista de categorias: SellerCategoriesScreen.kt.
+//Este es un componenete grafico (Card) reutilizable que controlara la parte grafica
+// de la pantalla de lista de categorias SellerCategoriesScreen.kt
+// y que contendra a cada categoria de la lista de categorias almacenada en Firestore,
+// que se mostrara con el diseño de este composable,
+// en la pantalla de lista de categorias: SellerCategoriesScreen.kt.
 //O sea, cada fila(categoria) de la lista de categorias por tienda,
 // que se mostrara en la pantalla de lista de categorias SellerCategoriesScreen.kt,
-// sera una instancia de este componente o composable: SellerCategoryItem()
+// sera una instancia de este componente grafico o composable: SellerCategoryItem()
 
 @Composable
 fun SellerCategoryItem(
-    category: Category
+    category: Category,
 //Esta es la categoria que se mostrara en la Columna de la lista de categorias de la tienda del vendedor actual,(Seller)
 // esta lista de categorias se mostrara en la pantalla de lista de categorias SellerCategoriesScreen.kt,
 // y provendra desde Firestore.
-//    onUpdate: (Category) -> Unit = {}, //Esta funcion recibe una categoria como parametro y no devuelve nada,
+    onUpdate: (Category) -> Unit = {}, //Esta funcion recibe una categoria como parametro y no devuelve nada,
     // y se usa para actualizar la categoria que se recibio como parametro, en Firestore,
-//    onDelete: (Category) -> Unit = {}, //Esta funcion recibe una categoria como parametro y no devuelve nada,
+    onDelete: (Category) -> Unit = {}, //Esta funcion recibe una categoria como parametro y no devuelve nada,
     // se usa para eliminar la categoria que se recibio como parametro, en Firestore,
 ) {
     /* Card(
@@ -138,7 +140,7 @@ fun SellerCategoryItem(
 //                Creamos otro boton (IconButton) para eliminar la categoria:
                 IconButton(
                     onClick = {
-//                        onDelete(category)
+                        onDelete(category)
                     }
                 ) {
                     Icon(

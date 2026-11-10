@@ -138,7 +138,14 @@ fun SellerCategoriesScreen(
                     items(state.categories) { category ->
 //                        Las categorias se mostraran segun el componente grafico SellerCategoryItem() que creamos,
                         //para que se muestren las categorias en el diseño de una Card:
-                        SellerCategoryItem(category = category)
+                        SellerCategoryItem(
+                            category = category,
+                            onDelete = {selectedCategory ->
+                                viewModel.onEvent(
+                                    SellerCategoriesListEvent.DeleteCategory(selectedCategory)
+                                )
+                            }
+                        )
                     }
                 }
             }
