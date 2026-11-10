@@ -103,6 +103,10 @@ class SellerCategoriesListViewModel @Inject constructor(
     //    Creamos un init que es ejecutado automaticamente cuando se crea la instancia del viewmodel, lo cual se hace desde
 //    la vista o pantalla de lista de categorias: SellerCategoriesScreen.kt:
     init {
+//   Aca llamamos a la fun que estara observando las categorias en tiempo real en Firestore,
+        //   para cargar la lista de categorias en la pantalla de lista de categorias SellerCategoriesScreen.kt,
+        //   apenas se inicie la pantalla de lista de categorias:
+        observeCategoriesInRealTime()
 
     }
 
@@ -110,7 +114,10 @@ class SellerCategoriesListViewModel @Inject constructor(
 // para evitar muchos listener en Firestore: false es que no estamos escuchando, true es que si estamos escuchando:
     private var isObservingCategories = false
 
-    //    Creamos una fun que estara observando los cambios de las categorias en tiempo real en Firestore, usando Flows
+    //    Creamos una fun que estara observando los cambios de las categorias en tiempo real en Firestore, usando Flows,
+    //    para cargar la lista de categorias en la pantalla de lista de categorias: SellerCategoriesScreen.kt:
+//    Esta fun se invoca automaticamente cuando se crea la instancia del viewmodel, o sea desde el init,
+//    lo cual se hace desde la vista o pantalla de lista de categorias: SellerCategoriesScreen.kt:
     private fun observeCategoriesInRealTime() {
 //        Condicion si estamos ya escuchando las categorias en tiempo real en Firestore, en tal caso salimos de esta fun, asi:
         if (isObservingCategories) return
@@ -128,12 +135,12 @@ class SellerCategoriesListViewModel @Inject constructor(
                 )
             }
 
-//            Ahorsa obtenemos al usuario actual de la autenticacion:
+//            Ahora obtenemos al usuario actual de la autenticacion:
             val user = authRepository.getCurrentUser()
 //            Obtenemos su id:
             val sellerUid = user?.uid
 
-//            Validamos que el exista el usuario actual vendedor:
+//            Validamos que exista el usuario actual vendedor:
             if (sellerUid.isNullOrBlank()) {
 //                Actuializamos el estado de la pantalla de lista de categorias: SellerCategoriesScreen.kt:            }
                 _uiState.update { current ->
@@ -150,11 +157,80 @@ class SellerCategoriesListViewModel @Inject constructor(
 
 
             } //Cierre if
+//      Generamos un try catch para obtener las categorias de la tienda del vendedor actual:
+            try {
+//                Primero obtenemos la tienda del vendedor actual:
+                val storeResult = storeRepository.getStoreBySeller(sellerUid)
+//              Si la obtencion de la tienda es exitosa, actualizamos el estado de la pantalla de lista de categorias: SellerCategoriesScreen.kt:
+                storeResult.onSuccess { store ->
+//                  Validamos si la tienda existe:
+//                    Si la tienda no existe, actualizamos el estado de la pantalla de lista de categorias: SellerCategoriesScreen.kt:
+                    if (store == null) {
+                        _uiState.update { current ->
+                            current.copy(
+                                listLoading = false,//ya no estamos cargando las categorias
+                                errorMessage = "No se encontro la tienda del vendedor"
+                            )
 
-//
+                        }
+                        //                    EMitimos un efecto de ShowMessage para mostrar un mensaje de error:
+                        _effect.emit(SellerCategoriesListEffect.ShowMessage("Este vendedor no tiene ninguna tienda registrada"))
+                        return@onSuccess //Salimos de la corrutina onSuccess, asi no sigue ejecutando el codigo:
+                    }
+//                   Escuchamos las categorias en tiempo real en Firestore, usando Flows.
+//                   categoryList es una lista de categorias de la tienda del vendedor actual,
+//                   que se actualiza en tiempo real en Firestore.
+//                   Con collect obtenemos la lista de categorias de la tienda del vendedor actual:
+                    categoryRepository.getCategoriesByStoreFlow(store.id).collect { categorieList ->
+//                        Luego actualizamos el estado de la pantalla de lista de categorias: SellerCategoriesScreen.kt:
+                        _uiState.update { current ->
+                            current.copy(
+                                categories = categorieList, //Aca obtenemos la lista de categorias de la tienda del vendedor actual
+                                listLoading = false, //ya no estamos cargando las categorias
+                                errorMessage = null //borramos el mensaje de error si lo habia
+                            )
+                        }
+                    }
+                    //Cierre onSuccess:
+//      //Si la obtencion de la tienda falla generamos una excepcion y
+                    //      actualizamos el estado de la pantalla de lista de categorias: SellerCategoriesScreen.kt
+                }.onFailure { error ->
+//                    Y actualizamos el estado de la pantalla de lista de categorias: SellerCategoriesScreen.kt
+                    _uiState.update { current ->
+                        current.copy(
+                            listLoading = false,//ya no estamos cargando las categorias
+                            errorMessage = error.message ?: "Error al obtener la tienda"
+                        )
+                    }
+                    //                    EMitimos un efecto de ShowMessage para mostrar un mensaje de error:
+                    _effect.emit(
+                        SellerCategoriesListEffect.ShowMessage(
+                            error.message ?: "Error al obtener las categorias"
+                        )
+                    )
 
 
+                }
+            } catch (e: Exception) {
+                //Si falla la obtencion de la tienda, actualizamos el estado de la pantalla de lista de categorias: SellerCategoriesScreen.kt
+                isObservingCategories =
+                    false //Ya no estamos escuchando las categorias en tiempo real en Firestore,
+                // nos permitira volver a escucharlas en otro momento.
+//                Actualizamos el estado de la pantalla de lista de categorias: SellerCategoriesScreen.kt
+                _uiState.update { current ->
+                    current.copy(
+                        listLoading = false,//ya no estamos cargando las categorias
+                        errorMessage = e.message ?: "Error al obtener las categorias"
+                    )
+                }
+                //                    EMitimos un efecto de ShowMessage para mostrar un mensaje de error:
+                _effect.emit(
+                    SellerCategoriesListEffect.ShowMessage(
+                        e.message ?: "Error al obtener las categorias"
+                    )
+                )
+
+            }
         }
-
     }
 }

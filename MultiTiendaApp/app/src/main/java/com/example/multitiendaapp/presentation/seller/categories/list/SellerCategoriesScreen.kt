@@ -80,7 +80,8 @@ fun SellerCategoriesScreen(
           },*/
         floatingActionButton = {
             FloatingActionButton(onClick = {
-//         El boton flotante lo usaremos para navegar desde la pantalla lista de categorias a la de agregar categoria
+//         El boton flotante lo usaremos para navegar desde la pantalla lista de categorias
+                //         a la pantalla formulario de agregar categoria,
                 // o sea desde SellerCategoriesScreen() a SellerCategoriesFormScreen()
                 //Esta declarado asi: navController.navigate(AppRoute.SellerCategoryForm.route), en SellerRootScreen(),
                 //pero usamos el callBack onGoToForm() que definimos en SellerCategoriesScreen():
