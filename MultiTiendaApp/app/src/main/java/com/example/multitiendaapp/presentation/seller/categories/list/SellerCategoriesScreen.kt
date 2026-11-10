@@ -26,7 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.multitiendaapp.presentation.seller.categories.form.SellerCategoryItem
 
-//Esta vista muestra el listado de las categorias de las tiendas registradas,
+//Esta vista muestra el listado de las categorias de las tiendas de los vendedores, registradas en Firestore,
 // Esta vista hay que registrarla en el contenedor de SellerRootScreen()
 @Composable
 fun SellerCategoriesScreen(
@@ -131,13 +131,13 @@ fun SellerCategoriesScreen(
                 LazyColumn(
                     modifier = Modifier.fillMaxSize(),
                     verticalArrangement = Arrangement.spacedBy(10.dp)
-                    //Para dar espacio vertical entre los elementos hijos de la columna
+                    //Para dar un espacio vertical de 10 dp, entre los elementos hijos de la columna
                 ) {
 //                    Iterms itera la lista categories y obtiene una categoria en cada iteracion,
                     // finalmente las muestra todas en la pantalla:
                     items(state.categories) { category ->
-//                        Las categorias se mostraran segun el componente SellerCategoryItem() que creamos,
-                        //para que se muestren las categorias en una Card:
+//                        Las categorias se mostraran segun el componente grafico SellerCategoryItem() que creamos,
+                        //para que se muestren las categorias en el diseño de una Card:
                         SellerCategoryItem(category = category)
                     }
                 }
