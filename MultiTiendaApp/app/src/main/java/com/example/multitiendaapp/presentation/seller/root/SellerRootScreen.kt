@@ -64,7 +64,7 @@ fun SellerRootScreen() {
 
 
                 // Aca pintamos la pantalla SellerCategoriesScreen() que creamos como vista,
-                // en donde se mostraran la lista de categorias por tienda registrada:
+                // en donde se mostraran la lista de categorias, segun cada tienda registrada:
                 SellerCategoriesScreen(
 //                    Usamos al viewModel como parametro para obtener la lista de categorias, para mostrarlos en la pantalla:
                     viewModel = viewModel,

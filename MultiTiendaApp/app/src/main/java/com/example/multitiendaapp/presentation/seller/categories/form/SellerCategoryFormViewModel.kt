@@ -1,5 +1,6 @@
 package com.example.multitiendaapp.presentation.seller.categories.form
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.multitiendaapp.core.model.Category
@@ -17,30 +18,43 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-//Este viewmodel es para controlar la parte logica de la pantalla de creacion de categorias: SellerCategoryFormScreen.kt
+//Este viewmodel es para controlar la parte logica de la pantalla del formulario
+//usado para la creacion de categorias: SellerCategoryFormScreen.kt
 
 //Creamos un data class que representa el estado de la pantalla de creacion de categorias: SellerCategoryFormScreen.kt
 data class SellerCategoryFormUiState(
     val name: String = "", //nombre de la categoria que el usuario ingrese en el campo de texto de la pantalla de creacion de categorias
-    val storeId: String = "", //id de la tienda, relacion con la tienda del vendedor que crea la categoria
+    val storeId: String = "", //id de la tienda, relacion con la tienda del vendedor que crea la categoria,
+    val isEditMode: Boolean = false, //para saber si el formulario esta en modo de edicion o no, para controlar operaciones,
+    //si esta en true es porque estamos editando una categoria existente,
+    // si esta en false es porque estamos creando una nueva categoria ,
     val isLoading: Boolean = false, //para saber si la pantalla esta cargando o no, para controlar operaciones,
     // ej que los botones esten deshabilitados mientras no se ingrese los datos
     val errorMessage: String? = null //para saber si hubo un error en la pantalla de creacion de categorias. Puede ser nulo
 )
 
-//Este sealed interface representa los eventos que vienen desde la vista de creacion de categorias:
+//Este sealed interface representa los eventos que vienen desde la vista del formulario de creacion de categorias:
 // SellerCategoryFormScreen.kt
-//Porque esa vista no ejecuta logica, solo envia eventos a este viewmodel:
+//Porque esa vista no ejecuta logica, solo envia eventos a este viewmodel el cual ejecuta logica:
 sealed interface SellerCategoryFormEvent {
-//    Creamos 3 data class que representan los eventos que vienen desde la vista de creacion de categorias
+//    Creamos los data class y data object que representan los eventos que vienen desde la vista de creacion de categorias
     //    y que seran procesados por la fun onEvent() de este viewmodel:
+
+//Primero el evento cuando el usuario ingresa el nombre de la categoria en el campo de texto de la pantalla de creacion de categorias:
     data class OnNameChange(val value: String) : SellerCategoryFormEvent
 
-    //repr el evento cuando el usuario ingresa el nombre de la categoria en el campo de texto de la pantalla de creacion de categorias.
+//    Luego un evento que, al presionar el boton guardar categoria,
+//    permitira crear una categoria o en su defecto editarla,
+//    dependiendo del modo de la variable isEditMode: false o true: SellerCategoryFormScreen.kt
+    data object OnSaveClick : SellerCategoryFormEvent
+
+//    Otro evento para limpiar el formulario:
+    data object OnClearForm : SellerCategoryFormEvent
+
 //    data class OnStoreIdChange(val value: String) : SellerCategoryFormEvent
 
     //repr el evento cuando el usuario ingresa el id de la tienda en el campo de texto de la pantalla de creacion de categorias.
-    data object OnCreateClick : SellerCategoryFormEvent
+//    data object OnCreateClick : SellerCategoryFormEvent
 //repr el evento cuando el usuario hace click en el boton de crear categoria.
 
 }
@@ -59,7 +73,7 @@ sealed interface SellerCategoryFormEffect {
 
 }
 
-
+//Ahora creamos el constructor del viewmodel, para controlar la logica de la pantalla de creacion de categorias:
 @HiltViewModel //Para que este viewmodel pueda ser gestionado por hilt y pueda ser inyectado en otras clases de la app.
 class SellerCategoryFormViewModel @Inject constructor(
 //    Inyectamos la dependencia del repositorio de categorias,
@@ -75,15 +89,29 @@ class SellerCategoryFormViewModel @Inject constructor(
 //    Inyectamos la dependencia del repositorio de tiendas,
 //    para que el viewmodel pueda acceder a los metodos de la interfaz StoreRepository,
 //    por ej para crear una tienda, obtener todas las tiendas, borrar una tienda, etc.,
-    private val storeRepository: StoreRepository
+    private val storeRepository: StoreRepository,
+
+//    hacemos lo siguiente para recuperar argumentos cuando los pasamos desde el navigation compose para el viewmodel:
+    savedStateHandle: SavedStateHandle
 
 ) : ViewModel() {
+
+    //    Por ej aca recuperamos el id de la categoria que se quiere editar, si existe categoruId es porque estamos editando una categoria existente,
+//    Si no exisre es porque estamos creando una nueva categoria:
+    private val categoryId: String? = savedStateHandle["categoryId"]
+
 //        Creamos el estado interno y externo de la pantalla de creacion de categorias(SellerCategoryFormScreen.kt),
     //entonces hacemos ref al data class SellerCategoryFormUiState()
     // que representa el estado de la pantalla de creacion de categorias:
 
     //        Primero creamos el estado de la pantalla de creacion de categorias en su version interna, para proteger de cambios en las vistas:
-    private val _uiState = MutableStateFlow(SellerCategoryFormUiState())
+    private val _uiState =
+        MutableStateFlow(
+            SellerCategoryFormUiState(
+                isEditMode = categoryId != null //si categoryId es null es porque estamos creando una nueva categoria,
+                // si no es null es porque estamos editando una categoria existente
+            )
+        )
 
     //    Luego creamos el estado de la pantalla de creacion de categorias en su version externa, expuesta en la vista pero solo lectura:
     val uiState: StateFlow<SellerCategoryFormUiState> = _uiState.asStateFlow()
@@ -94,17 +122,22 @@ class SellerCategoryFormViewModel @Inject constructor(
     //    Luego creamos el flujo externo para los efectos, expuesta en la vista pero solo lectura:
     val effect: SharedFlow<SellerCategoryFormEffect> = _effect.asSharedFlow()
 
-    //    Creamos una fun onEvent para manejar los eventos del usuario, que vienen desde la vista de creacion de categorias,
+    //    Creamos una fun onEvent para manejar los eventos del usuario,
+    //    que vienen desde la vista de creacion de categorias: SellerCategoryFormScreen.kt
 //    o sea es la puerta de entrada del usuario, en la vista de creacion de categorias, para interactuar con el viewmodel:
     fun onEvent(event: SellerCategoryFormEvent) {
         when (event) {
             is SellerCategoryFormEvent.OnNameChange -> updateName(event.value)
-            //Si el usuario ingresa el nombre de la categoria, lo procesamos en la fun updateName()
+            //Si el usuario ingresa el nombre de la categoria, llalamos a la fun updateName()
 
 //          EL StoreId no se gestiona aca porque se gestiona automaticamente en el init del viewmodel,
 
-            is SellerCategoryFormEvent.OnCreateClick -> createCategory()
-            //Si el usuario hace click en el boton de crear categoria, lo procesamos en la fun createCategory()
+            //Si el usuario hace click en el boton de crear categoria, llamamos a la fun saveCategory():
+            is SellerCategoryFormEvent.OnSaveClick -> saveCategory()
+
+
+//            Y si el usuario hace click en el boton de limpiar formulario, llamamos a la fun clearForm():
+            is SellerCategoryFormEvent.OnClearForm -> clearForm()
 
         }
     }
@@ -192,32 +225,95 @@ class SellerCategoryFormViewModel @Inject constructor(
         }
     }
 
+    //    Creamos una fun para cargar una categoria existente segun su Id,
+//    lo cual podra ser cuando estemos en modo de edicion:
+    private fun loadCategoryById(id: String) {
+        viewModelScope.launch {
+//        vamos aactualizar la pantalla:
+            _uiState.update { current ->
+                current.copy(
+                    isLoading = true, //activamos el estado de carga de la pantalla de creacion de categorias
+                    errorMessage = null //borramos el mensaje de error si lo habia
+                )
+            }
+
+//        llamamspo al repositorio de la categoria para obtener la categoria por su Id:
+            val result = categoryRepository.getCategoryById(id)
+//        Si fue exitosa la obtencion de la categoria,
+//        actualizamos el estado de la pantalla de creacion de categorias:
+            result.onSuccess { category ->
+//            Actualizamos el estado de la pantalla de creacion de categorias:
+                _uiState.update { current ->
+                    current.copy(
+                        name = category!!.name, //actualizamos el nombre de la categoria con el nombre de la categoria
+                        // que obtuvimos del repositorio de la categoria, !!X confiamos que no es nulo y lo usamos
+                        storeId = category.storeId, //actualizamos el id de la tienda con el id de la tienda
+                        isLoading = false, //dejamos de cargar
+                        errorMessage = null //borramos el mensaje de error si lo habia
+                    )
+                }
+            }.onFailure { error ->
+                _uiState.update { current ->
+                    current.copy(
+                        isLoading = false, //dejamos de cargar
+                        errorMessage = error.message ?: "No se pudo cargar la categoria"
+                    )
+                }
+
+                _effect.emit(
+                    SellerCategoryFormEffect.ShowMessage(
+                        error.message ?: "No se pudo cargar la categoria"
+                    )
+                )
+            }
+
+
+        }
+    }
+
+    //    Otra fun encargada de decidir si crear o editar una categoria en Firestore:
+    private fun saveCategory() {
+//    Para eviatr multiples ejecuciones de la fun, usamos el estado de la pantalla de creacion de categorias:
+        if (_uiState.value.isLoading) true //si el estado de la pantalla de creacion de categorias esta cargando, no hacemos nada,
+
+        val state = _uiState.value //obtenemos el estado de la pantalla de creacion de categorias:
+
+//    Limpiamos los espacios en blanco del campo nombre:
+        val name = state.name.trim()
+
+        val storeId = state.storeId //Ya lo obtuvimos en el init del viewmodel:
+
+//    validamos que el nombre no este vacio:
+        if (name.isBlank()) {
+            viewModelScope.launch {
+                _effect.emit(SellerCategoryFormEffect.ShowMessage("El nombre de la categoria no puede estar vacio"))
+            }
+            return //O sea salimos de la fun
+        }
+
+//    valiodamos que el storeId no este vacio:
+        if (storeId.isBlank()) {
+            viewModelScope.launch {
+                _effect.emit(SellerCategoryFormEffect.ShowMessage("No se encontro la tienda del vendedor"))
+            }
+            return //O sea salimos de la fun
+        }
+
+//    Falta crear una condicion si queremos editar o crear una categoria:
+        if (_uiState.value.isEditMode) {
+            updateCategory(name)
+        } else {
+            createCategory(name, storeId)
+        }
+    }
+
     //    Creamos otra fun que permita crear la categoria, cuando el usuario hace click en el boton de crear categoria:
-    private fun createCategory() {
-        if (_uiState.value.isLoading) return //si el estado de la pantalla de creacion de categorias esta cargando, no hacemos nada,
-// para evitar que el boton de crear categoria se pueda presionar varias veces. Cuando ya este creando la categoria, el boton se desactiva.
+    private fun createCategory(name: String, storeId: String) {
 //    Creamos una corrutina para crear la categoria en segundo plano,
 //    primero se limpia el nombre ingresado por el usuario y el id,
 //    para que al presionar el boton de crear categoria:
         viewModelScope.launch {
-//        Primero limpiamos el nombre ingresado por el usuario:
-            val nameTrimmed = _uiState.value.name.trim()
-//        Obtenemos el valor del id de la tienda del vendedor actual qie ya obtuvimo en el init:
-            val storeId = _uiState.value.storeId
-
-//        Validamos nombre y id:
-            if (nameTrimmed.isEmpty()) {
-                _effect.emit(SellerCategoryFormEffect.ShowMessage("El nombre de la categoria no puede estar vacio"))
-                return@launch
-                //O sea salimos de la corrutina
-            }
-
-            if (storeId.isBlank()) {
-                _effect.emit(SellerCategoryFormEffect.ShowMessage("No se encontro la tienda del vendedor"))
-                return@launch
-                //O sea salimos de la corrutina
-            }
-//        Activamos el estyado de carga de la pantalla de creacion de categorias:
+//        Activamos el estado de carga de la pantalla de creacion de categorias:
             _uiState.update { current ->
                 current.copy(
                     isLoading = true, //activamos el estado de carga
@@ -225,10 +321,11 @@ class SellerCategoryFormViewModel @Inject constructor(
                 )
             }
 
-//        Creamos un objeto Category con el nombre de la categoria y el id de la tienda del vendedor actual:
+//        Creamos un objeto Category con el nombre de la categoria y el id de la tienda del vendedor actual,
+//        para que se cree en Firestore:
             val category = Category(
 //            id no lo pasamos porque es generado por firebase
-                name = nameTrimmed,
+                name = name,
                 storeId = storeId
             )
 
@@ -241,18 +338,20 @@ class SellerCategoryFormViewModel @Inject constructor(
             result.onSuccess {
                 _uiState.update { current ->
                     current.copy(
-                        name = "", //limpiamos el nombre de la categoria
                         isLoading = false, //dejamos de cargar
                         errorMessage = null //borramos el mensaje de error si lo habia
                     )
                 }
+//                Como la creacion de la categoria en Firestore fue exitosa, limpiamos el formulario:
+                clearFormInternal()
+
 //            Generamos un efecto para mostrar un mensaje de creacion exitosa:
                 _effect.emit(SellerCategoryFormEffect.ShowMessage("Categoria creada exitosamente"))
 //            Y generamos un efecto para navegar a la pantalla anterior:
                 _effect.emit(SellerCategoryFormEffect.NavigateBack)
 
 //                Finalmente queremos que nos direccione a la pantalla de lista de categorias: SellerCategoriesScreen.kt:
-            /*    navController.navigate(AppRoute.SellerCategoriesList.route)*/
+                /*    navController.navigate(AppRoute.SellerCategoriesList.route)*/
 
 //            Ahora si fallo la creacion de la categoria,
                 //            nos devuelve un error,
@@ -276,5 +375,82 @@ class SellerCategoryFormViewModel @Inject constructor(
         }
     }
 
+    //    Creamos una fun para actualizar la categoria, cuando el usuario hace click en el boton de editar categoria:
+    private fun updateCategory(name: String) {
+        viewModelScope.launch {
+            val id = categoryId ?: return@launch //si categoryId es null, salimos de la fun
+//            Actualizamos la pantalla de creacion de categorias:
+            _uiState.update { current ->
+                current.copy(
+                    isLoading = true, //activamos el estado de carga mientras cargamos la categoria
+                    errorMessage = null //borramos el mensaje de error si lo habia
+                )
+            }
+//            Creamos el obj category para actualizar:
+            val category = Category(
+                id = id,
+                name = name,
+                storeId = uiState.value.storeId
+            )
 
+//            Enviamos la categoria actualizada al repositorio de categorias para actualizarla en Firestore:
+            categoryRepository.updateCategory(category)
+                .onSuccess {
+                    //            Si fue exitosa, actualizamos el estado de la pantalla de creacion de categorias a su estado inicial:
+                    _uiState.update { current ->
+                        current.copy(
+                            isLoading = false, //dejamos de cargar
+                            errorMessage = null //borramos el mensaje de error si lo habia
+                        )
+                    }
+
+                    _effect.emit(SellerCategoryFormEffect.ShowMessage("Categoria actualizada exitosamente"))
+
+//                    Y navegamos a la pantalla anterior de lista de categorias:
+                    _effect.emit(SellerCategoryFormEffect.NavigateBack)
+
+                }.onFailure { error ->
+                    //            Si fallo la actualizacion de la categoria,
+                    //            nos devuelve un error,
+                    //            entonces hacemos una copia del estado actual de la pantalla de creacion de categorias, y
+                    _uiState.update { current ->
+                        current.copy(
+                            isLoading = false, //dejamos de cargar
+                            errorMessage = error.message ?: "No se pudo actualizar la categoria"
+                        )
+                    }
+                    _effect.emit(
+                        SellerCategoryFormEffect.ShowMessage(
+                            error.message ?: "No se pudo actualizar la categoria"
+                        )
+                    )
+                }
+
+        }
+    }
+
+//    Otra fun encargada de limpiar el estado del nombre de la categoria
+//    y el errorMessage del estado de la pantalla de creacion de categorias.
+//    Se llama si la creacion de la categoria fue exitosa
+
+    private fun clearFormInternal() {
+//        Actualizamos el estado de la pantalla de creacion de categorias:
+        _uiState.update { current ->
+            current.copy(
+                name = "",
+                errorMessage = null
+            )
+        }
+
+    }
+
+    //    Otra fun para llamar a la fun clearFormInternal():
+    private fun clearForm() {
+        clearFormInternal()
+//    Emitimos un mensaje de limpiado exitos en una corrutina:
+        viewModelScope.launch {
+            _effect.emit(SellerCategoryFormEffect.ShowMessage("Formulario limpiado"))
+        }
+
+    }
 }

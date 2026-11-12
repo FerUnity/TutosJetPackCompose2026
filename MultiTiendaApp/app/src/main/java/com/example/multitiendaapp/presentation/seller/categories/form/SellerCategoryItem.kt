@@ -29,7 +29,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.multitiendaapp.core.model.Category
 
-//Este es un componenete grafico (Card) reutilizable que controlara la parte grafica
+//Este es un componenente grafico (Card) reutilizable que controlara la parte grafica
 // de la pantalla de lista de categorias SellerCategoriesScreen.kt
 // y que contendra a cada categoria de la lista de categorias almacenada en Firestore,
 // que se mostrara con el diseño de este composable,
