@@ -59,7 +59,27 @@ sealed class AppRoute(val route: String) {
 //    Ruta para mostrar una lista de las categorias de las tiendas registradas:
     data object SellerCategoriesList : AppRoute("seller/categories/list")
 
-    data object SellerCategoryForm : AppRoute("seller/categories/form")
+    //    En esta ruta se mostrara el formulario de creacion o edicion de categorias:
+//    Para crear una nueva categoria la ruta sera: seller/categories/form
+//    Pero para actualizar/editar una categoria existente estamos agregando el parametro categoryId, Se escribre asi:
+    data object SellerCategoryForm : AppRoute("seller/categories/form?categoryId={categoryId}") {
 
+        //        Creamos una constante reutilizable para el parametro categoryId:
+        const val ARG_CATEGORY_ID = "categoryId"
+
+        //    Ahora creamos una fun que nos permita construir rutas dinamicas,
+//    recibe como parametro el id de la categoria que se selecciono, que puede ser nulo:
+        fun createRoute(categoryId: String? = null): String {
+//            Que pasa si el parametro categoryId es nulo?
+            return if (categoryId.isNullOrBlank()) {
+//                Si es nulo entramos en modo creacion, asi:
+                "seller/categories/form"
+            } else {
+//                Si no es nulo, entramos en modo edicion, asi:
+                "seller/categories/form?categoryId=$categoryId"
+//                En que categotyId es el parametro que recibimos como argumento desde SellerCategoriesScreen(),
+            }
+        }
+    }
 
 }

@@ -5,9 +5,11 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.example.multitiendaapp.navigation.AppRoute
 import com.example.multitiendaapp.presentation.component.SellerBottomBar
 import com.example.multitiendaapp.presentation.seller.categories.form.SellerCategoryFormScreen
@@ -70,14 +72,32 @@ fun SellerRootScreen() {
                     viewModel = viewModel,
 //                    Creamos un callback para llamar a la fun composable SellerCategoryFormScreen() de mas abajo,
 //                    que es para ir al formulario de creacion de categorias:
-                    onGoToForm = {
-                        navController.navigate(AppRoute.SellerCategoryForm.route)
+//                    Aca recibimos como parametro el id de la categoria que se selecciono, la cual puede ser nulo:
+//                    Por eso llamamos a la fun createRoute() de SellerCategoryForm.kt,
+//                    que gestiona si se crea una nueva categoria o se edita una existente,
+//                    segun exista o no el parametro categoryId:
+                    onGoToForm = {categoryId ->
+                        navController.navigate(AppRoute.SellerCategoryForm.createRoute(categoryId))
                     }
                 )
             }
 
 //            Ahora agregamos la vista del formulario de creacion de categorias:
-            composable(AppRoute.SellerCategoryForm.route) { backStackEntry ->
+            composable(
+                route = AppRoute.SellerCategoryForm.route,
+//                Ahora agregamos una lista de argumentos que recibira esta pantalla, con
+//                los argumentos de navegacion que definimos en SellerCategoryForm.kt:,
+                arguments = listOf(
+                    navArgument(AppRoute.SellerCategoryForm.ARG_CATEGORY_ID) {
+//                        Ahora definimos el tipo de argumento que recibira esta pantalla,
+                        //que sera un String que indicara el id de la categoria que se selecciono,
+                        // y que podra ser nulable segun queramos crear una categoria nueva o editarla:
+                        type = NavType.StringType
+                        nullable = true //Para que pueda ser nulable y asi poder crear una nueva categoria
+                        defaultValue = null //Para que tenga un valor por defecto nulo, para poder crear una nueva categoria
+                    }
+                )
+            ) { backStackEntry ->
                 val viewModel: SellerCategoryFormViewModel = hiltViewModel(backStackEntry)
 //                El backStackEntry es un objeto que representa la entrada en la pila o historial de navegación.
 //                El hiltViewModel() es una función que se utiliza para obtener un ViewModel desde Hilt

@@ -44,9 +44,11 @@ fun SellerCategoryItem(
 //Esta es la categoria que se mostrara en la Columna de la lista de categorias de la tienda del vendedor actual,(Seller)
 // esta lista de categorias se mostrara en la pantalla de lista de categorias SellerCategoriesScreen.kt,
 // y provendra desde Firestore.
-    onUpdate: (Category) -> Unit = {}, //Esta funcion recibe una categoria como parametro y no devuelve nada,
-    // y se usa para actualizar la categoria que se recibio como parametro, en Firestore,
-    onDelete: (Category) -> Unit = {}, //Esta funcion recibe una categoria como parametro y no devuelve nada,
+    onGoToForm: () -> Unit, //Esta funcion o callback permite ir hacia el formulario de edicion o creacion de una categoria,
+    // y se llama desde el IconButton creado para actualizar la categoria.
+    // Esta fun lo recibira la pantalla padre que es SellerCategoriesScreen.kt, que se encargara de llamarla
+    // y asi navegar a la pantalla de creacion o edicion de categorias con el id de la categoria que seleccionemos.
+    onDelete: (Category) -> Unit //Esta funcion recibe una categoria como parametro y no devuelve nada,
     // se usa para eliminar la categoria que se recibio como parametro, en Firestore,
 ) {
     /* Card(
@@ -126,7 +128,7 @@ fun SellerCategoryItem(
 //                Creamos un boton (IconButton) para actualizar la categoria:
                 IconButton(
                     onClick = {
-//                        onUpdate(category)
+                        onGoToForm()
                     }
                 ) {
                     Icon(

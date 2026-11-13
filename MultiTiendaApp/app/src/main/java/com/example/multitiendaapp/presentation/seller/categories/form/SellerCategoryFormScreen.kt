@@ -29,7 +29,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.multitiendaapp.R
 
-//Este formulario es para que el usuario VENDEDOR, pueda CREAR categorias a las tiendas,
+//Este composable es la vista del formulario es para que el usuario VENDEDOR, pueda CREAR categorias a las tiendas,
 // quedando registradas en la BBDD firebase:
 // la parte logica de este formulario esta en SellerCategoryFormViewModel.kt,
 // Esta vista hay que registrarla en contenedor de SellerRootScreen()
@@ -84,9 +84,16 @@ fun SellerCategoryFormScreen(
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             //Para dar espacio vertical de 12.dp, entre los elementos hijos de la columna
             ) {
+//                El siguiente texto lo hacemos dinamico,
+                //identificar si entramos en modo edicion o creacion, segun el parametro isEditMode,
+                // usando un if else para que muestre un texto u otro: creacion o edicion:
                 Text(
+                    text = if (state.isEditMode){
+                        "Editar categoria"
+                    } else {
+                        "Crear categoria"
+                    },
                     modifier = Modifier.align(Alignment.CenterHorizontally),
-                    text = "Crear categoria",
                     style = MaterialTheme.typography.titleMedium
                 )
 
@@ -130,13 +137,23 @@ fun SellerCategoryFormScreen(
                         .fillMaxWidth()
                         .height(50.dp),
                     onClick = {
-                        viewModel.onEvent(SellerCategoryFormEvent.OnCreateClick)
-                        //O sea aca se envia el evento OnCreateClick al viewModel,
-                        // entonces el viewmodel recibe el evento y lo procesa, ejecutando la fun createCategory(),
+                        viewModel.onEvent(SellerCategoryFormEvent.OnSaveClick)
+                        //O sea aca se envia el evento OnSaveClick al viewModel,
+                        // para que el viewmodel procese el evento y ejecute la fun saveCategory()
+                        // la cual decide si crear o editar una categoria segun sea el valor del parametro isEditMode,
                     },
                     enabled = !state.isLoading //Para habilitar el boton segun este cargando o no.
                 ) {
-                    Text(text = "Agregar categoria")
+//                    Tambien aca cambiamos el texto segun sea modo edicion o creacion,
+                    // o cual lo definira el parametro isEditMode,
+                    // en que state es el estado actual del viewModel:
+                    Text(
+                        text = if (state.isEditMode){
+                            "Actualizar categoria"
+                        } else {
+                            "Crear categoria"
+                        }
+                    )
                 }
 
             }

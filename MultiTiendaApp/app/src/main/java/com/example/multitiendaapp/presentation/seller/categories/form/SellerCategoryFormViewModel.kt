@@ -136,7 +136,8 @@ class SellerCategoryFormViewModel @Inject constructor(
             is SellerCategoryFormEvent.OnSaveClick -> saveCategory()
 
 
-//            Y si el usuario hace click en el boton de limpiar formulario, llamamos a la fun clearForm():
+//            Y si el usuario hace click en el boton de limpiar formulario, llamamos a la fun clearForm()
+//            del viewmodel:
             is SellerCategoryFormEvent.OnClearForm -> clearForm()
 
         }
@@ -145,10 +146,16 @@ class SellerCategoryFormViewModel @Inject constructor(
     //    Aca creamos un init que es ejecutado automaticamente cuando se crea la instancia del viewmodel:
     init {
         loadStoreId() //llamamos a la fun loadStoreId() para obtener el id de la tienda del vendedor actual.
+
+//        generamos tambien una condicion para obtener la categoria por su Id y mostrarla en la pantalla de creacion de categorias
+//        para editarla:
+        if (categoryId != null) {
+            loadCategoryById(categoryId)
+        }
     }
 
     //    Creamos 3 funciones esenciales:
-    //    Primero una fun que nos permita obtener el id de la tienda del vendedor actual,
+    //    Primero una fun que nos permita obtener el id de la tienda del vendedor actual.
     //    esta fun se llamara en el init del viewmodel para obtener el id de la tienda del vendedor actual:
     private fun loadStoreId() {
         viewModelScope.launch {
@@ -226,10 +233,10 @@ class SellerCategoryFormViewModel @Inject constructor(
     }
 
     //    Creamos una fun para cargar una categoria existente segun su Id,
-//    lo cual podra ser cuando estemos en modo de edicion:
+//    lo cual nos permite editar una categoria al seleccionarla de la lista de categorias:
     private fun loadCategoryById(id: String) {
         viewModelScope.launch {
-//        vamos aactualizar la pantalla:
+//        vamos a actualizar la pantalla:
             _uiState.update { current ->
                 current.copy(
                     isLoading = true, //activamos el estado de carga de la pantalla de creacion de categorias
@@ -299,7 +306,8 @@ class SellerCategoryFormViewModel @Inject constructor(
             return //O sea salimos de la fun
         }
 
-//    Falta crear una condicion si queremos editar o crear una categoria:
+//    Falta crear una condicion si queremos editar o crear una categoria.
+//    Esta condicion la define el estado de la pantalla de creacion de categorias con el parametro isEditMode:
         if (_uiState.value.isEditMode) {
             updateCategory(name)
         } else {

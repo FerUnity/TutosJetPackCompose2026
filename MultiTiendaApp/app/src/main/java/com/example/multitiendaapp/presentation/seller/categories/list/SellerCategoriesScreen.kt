@@ -32,7 +32,12 @@ import com.example.multitiendaapp.presentation.seller.categories.form.SellerCate
 fun SellerCategoriesScreen(
     viewModel: SellerCategoriesListViewModel,
     //aca pasamos el viewModel, SellerCategoriesListViewModel, para la logica de esta vista.
-    onGoToForm: () -> Unit //Solo se ejecuta la funcion que se define en SellerRootScreen(), no devuelve nada
+    onGoToForm: (String?) -> Unit //Solo se ejecuta la funcion que se define en SellerRootScreen()
+// que este callback permitira navegar hacia el formulario de creacion o edicion de categorias, y no devuelve nada,
+// esta fun recibe como parametro el id de la categoria que se selecciono,
+// para navegar a la pantalla de creacion o edicion de categorias con el id de la categoria que seleccionemos.
+// Ojo: Si no es nulo el parametro significa que entramos en modo edicion,
+// y si es nulo significa que entramos en modo creacion de una nueva categoria.
 ) {
     //    Creamos un estado para escuchar u observar el estado del viewModel de esta pantalla de lista de categorias,
 // esto es para que cuando haya un cambio en esta vista, se recomponga de inmediato:
@@ -81,11 +86,12 @@ fun SellerCategoriesScreen(
         floatingActionButton = {
             FloatingActionButton(onClick = {
 //         El boton flotante lo usaremos para navegar desde la pantalla lista de categorias
-                //         a la pantalla formulario de agregar categoria,
+                //         a la pantalla formulario de editar o crear una categoria,
                 // o sea desde SellerCategoriesScreen() a SellerCategoriesFormScreen()
                 //Esta declarado asi: navController.navigate(AppRoute.SellerCategoryForm.route), en SellerRootScreen(),
                 //pero usamos el callBack onGoToForm() que definimos en SellerCategoriesScreen():
-                onGoToForm()
+                onGoToForm(null)
+//                El param por defecto es nulo porque vamos a crear una nueva categoria,
             }
 //                , containerColor = MaterialTheme.colorScheme.primary
             ) {
@@ -140,6 +146,11 @@ fun SellerCategoriesScreen(
                         //para que se muestren las categorias en el diseño de una Card:
                         SellerCategoryItem(
                             category = category,
+                            onGoToForm = {
+//                                El callback onGoToForm() de SellerCategoryItem(),
+                                //recibe el id de la categoria que se selecciono,
+                                onGoToForm(category.id)
+                            },
                             onDelete = {selectedCategory ->
                                 viewModel.onEvent(
                                     SellerCategoriesListEvent.DeleteCategory(selectedCategory)
